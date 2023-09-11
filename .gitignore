@@ -1,0 +1,11 @@
+.bundle
+
+## MAC OS
+.DS_Store
+
+## PROJECT::GENERAL
+coverage
+doc
+pkg
+tmp
+Gemfile.lock
