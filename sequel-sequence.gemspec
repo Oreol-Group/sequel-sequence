@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
   spec.platform              = Gem::Platform::RUBY
   spec.required_ruby_version = '>= 2.7.0'
 
-  spec.add_dependency 'sequel', '~> 5.28.0'
+  spec.add_dependency 'sequel', '>= 5.28', '< 5.73'
   spec.add_development_dependency 'bundler', '>= 2.2.4'
   spec.add_development_dependency 'minitest-utils', '~> 0.4.6'
   spec.add_development_dependency 'pry-byebug', '~> 3.8.0'
