@@ -40,6 +40,6 @@ Gem::Specification.new do |spec|
   else
     # MRI/Rubinius Adapter Dependencies
     spec.add_development_dependency 'mysql2', '~> 0.5.3'
-    spec.add_development_dependency 'pg', '~> 1.2.0'
+    spec.add_development_dependency 'pg', '~> 1.5.4'
   end
 end
