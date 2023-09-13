@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pry-byebug', '~> 3.8.0'
   spec.add_development_dependency 'rake', '~> 13.0.2'
   spec.add_development_dependency 'rubocop', '~> 1.44.0'
-  spec.add_development_dependency 'simplecov', '~> 0.21.0'
+  spec.add_development_dependency 'simplecov', '~> 0.22.0'
   if RUBY_ENGINE == 'jruby'
     # JRuby Adapter Dependencies
     spec.add_development_dependency 'jdbc-mysql', '~> 8.0.17'
