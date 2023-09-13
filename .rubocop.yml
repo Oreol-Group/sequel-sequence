@@ -1,0 +1,33 @@
+AllCops:
+  TargetRubyVersion: 2.7
+  NewCops: enable
+  SuggestExtensions:
+    rubocop-rake: false
+
+Naming/FileName:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ClassLength:
+  Exclude:
+    - test/**/*
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Gemspec/RequireMFA:
+  Enabled: false
+
+Gemspec/DevelopmentDependencies:
+  EnforcedStyle: gemspec
+
+Style/Documentation:
+  Enabled: false

@@ -9,7 +9,7 @@ changes to this document in a pull request.
 ## Code of Conduct
 
 Everyone interacting in this project's codebases, issue trackers, chat rooms and
-mailing lists is expected to follow the [code of conduct](https://github.com/fnando/sequel-sequence/blob/main/CODE_OF_CONDUCT.md).
+mailing lists is expected to follow the [code of conduct](https://github.com/fnando/sequel-sequence/blob/master/CODE_OF_CONDUCT.md).
 
 ## Reporting bugs
 
@@ -81,7 +81,6 @@ test=# \dt
 --------+---------+-------+-----------
  public | masters | table | USER_NAME
  public | things  | table | USER_NAME
-(2 rows)
 ```
 - If it doesn't exists, create one with a couple of tables:
 ```bash
@@ -104,7 +103,6 @@ MariaDB [test]> SHOW TABLES;
 | builders             |
 | wares                |
 +----------------------+
-4 rows in set (0.001 sec)
 ```
 - If it doesn't exists, create one with a couple of tables:
 ```bash

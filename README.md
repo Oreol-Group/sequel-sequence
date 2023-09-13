@@ -1,8 +1,8 @@
 # sequel-sequence
 
-[![Tests](https://github.com/oreol-group/sequel-sequence/workflows/Tests/badge.svg)](https://github.com/oreol-group/sequel-sequence)
+[![CI](https://github.com/oreol-group/sequel-sequence/actions/workflows/ci.yml/badge.svg)](https://github.com/oreol-group/sequel-sequence)
 [![Gem](https://img.shields.io/gem/v/sequel-sequence.svg)](https://rubygems.org/gems/sequel-sequence)
-[![Downloads total](https://img.shields.io/gem/dt/sequel-sequence.svg)](https://rubygems.org/gems/sequel-sequence)
+[![Downloads total](https://img.shields.io/gem/dt/sequel-sequence.svg)](https://rubygems.org/profiles/it_architect)
 
 Adds a useful interface and support for PostgreSQL and MySQL `SEQUENCE` on Sequel migrations
 
@@ -93,16 +93,16 @@ DB.setval("position", 1234)
 ## Contributing
 
 For more details about how to contribute, please read
-https://github.com/oreol-group/sequel-sequence/blob/main/CONTRIBUTING.md.
+https://github.com/oreol-group/sequel-sequence/blob/master/CONTRIBUTING.md.
 
 ## License
 
 The gem is available as open source under the terms of the
 [MIT License](https://opensource.org/licenses/MIT). A copy of the license can be
-found at https://github.com/oreol-group/sequel-sequence/blob/main/LICENSE.md.
+found at https://github.com/oreol-group/sequel-sequence/blob/master/LICENSE.md.
 
 ## Code of Conduct
 
 Everyone interacting in the sequel-sequence project's codebases, issue trackers,
 chat rooms and mailing lists is expected to follow the
-[code of conduct](https://github.com/oreol-group/sequel-sequence/blob/main/CODE_OF_CONDUCT.md).
+[code of conduct](https://github.com/oreol-group/sequel-sequence/blob/master/CODE_OF_CONDUCT.md).

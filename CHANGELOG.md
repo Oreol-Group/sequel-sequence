@@ -11,6 +11,11 @@ Prefix your message with one of the following:
 - [Security] in case of vulnerabilities.
 -->
 
+## v0.1.1 - 2023-09-13
+
+- [Added] CI features based on GitHub Actions.
+- [Fixed] README.
+
 ## v0.1.0 - 2023-09-10
 
 - Initial release.

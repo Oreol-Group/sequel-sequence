@@ -1,11 +1,14 @@
-.bundle
-
 ## MAC OS
 .DS_Store
 
 ## PROJECT::GENERAL
 coverage
+rdoc
 doc
 pkg
 tmp
+log
+
+## PROJECT::SPECIFIC
+.bundle
 Gemfile.lock
