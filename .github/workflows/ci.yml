@@ -44,7 +44,7 @@ jobs:
       SEQUEL: ${{ matrix.sequel }}
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install db dependencies and check connections
         run: |
