@@ -4,17 +4,6 @@ require 'test_helper'
 
 MysqlDB = Sequel.connect('mysql2://root:root@localhost/test')
 
-Sequel::Model.db = MysqlDB
-
-class Ware < Sequel::Model
-end
-
-class InheritedWare < Ware
-end
-
-class Builder < Sequel::Model
-end
-
 module MysqlTestHelper
   def recreate_table
     MysqlDB.run 'DROP SEQUENCE IF EXISTS position'
@@ -24,5 +13,13 @@ module MysqlTestHelper
     MysqlDB.run 'DROP SEQUENCE IF EXISTS c'
     sql = 'CREATE TABLE wares (id INT AUTO_INCREMENT, slug VARCHAR(255), quantity INT DEFAULT(0), PRIMARY KEY(id));'
     MysqlDB.run sql
+  end
+
+  def with_migration(&block)
+    migration_class = Sequel::Migration
+
+    Sequel::Model.db = MysqlDB
+
+    Class.new(migration_class, &block).new(MysqlDB)
   end
 end

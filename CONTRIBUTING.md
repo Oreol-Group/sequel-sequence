@@ -9,7 +9,7 @@ changes to this document in a pull request.
 ## Code of Conduct
 
 Everyone interacting in this project's codebases, issue trackers, chat rooms and
-mailing lists is expected to follow the [code of conduct](https://github.com/fnando/sequel-sequence/blob/master/CODE_OF_CONDUCT.md).
+mailing lists is expected to follow the [code of conduct](https://github.com/oreol-group/sequel-sequence/blob/master/CODE_OF_CONDUCT.md).
 
 ## Reporting bugs
 
@@ -26,7 +26,7 @@ the behavior, and find related reports.
 ## Contributing with code
 
 Before making any radicals changes, please make sure you discuss your intention
-by [opening an issue on Github](https://github.com/fnando/sequel-sequence/issues).
+by [opening an issue on Github](https://github.com/oreol-group/sequel-sequence/issues).
 
 When you're ready to make your pull request, follow checklist below to make sure
 your contribution is according to how this project works.
@@ -82,9 +82,21 @@ test=# \dt
  public | masters | table | USER_NAME
  public | things  | table | USER_NAME
 ```
-- If it doesn't exists, create one with a couple of tables:
+and role `postgres`
 ```bash
-sudo psql -U USER_NAME -d postgres
+psql -d test -c 'SELECT rolname FROM pg_roles;'
+          rolname          
+---------------------------
+ postgres
+```
+- If none of them exist, create role
+```bash
+psql -d postgres -c "create role postgres superuser createdb login password 'postgres';"
+```
+and database with a couple of tables:
+
+```bash
+sudo psql -U postgres -d postgres
 postgres=# CREATE DATABASE test;
 postgres=# \c test
 test=# CREATE TABLE IF NOT EXISTS things ();
@@ -113,6 +125,6 @@ MariaDB [test]> CREATE TABLE IF NOT EXISTS builders(id int auto_increment, prima
 ```
 - Run the tests separately:
 ```bash
-bundle exec rake TEST=test/ar/postgresql_sequence_test.rb
-bundle exec rake TEST=test/ar/mysql_sequence_test.rb
+bundle exec rake TEST=test/sequel/postgresql_sequence_test.rb
+bundle exec rake TEST=test/sequel/mysql_sequence_test.rb
 ```

@@ -10,97 +10,108 @@ class MysqlSequenceTest < Minitest::Test
   end
 
   test 'adds sequence with default values' do
-    Sequel.migration do
-      up do
+    with_migration do
+      def up
+        # create_sequence :position, {start: 1, increment: 1} - default values
         create_sequence :position
       end
-    end.apply(MysqlDB, :up)
+    end.up
 
-    assert_equal 1, Ware.db.nextval(:position)
-    assert_equal 2, Ware.db.nextval(:position)
+    assert_equal 1, MysqlDB.nextval(:position)
+    assert_equal 2, MysqlDB.nextval(:position)
   end
 
-  test 'adds sequence reader within inherited class' do
-    Sequel.migration do
-      up do
+  test 'adds sequence reader within model and its inherited class' do
+    with_migration do
+      def up
         create_sequence :position
       end
-    end.apply(MysqlDB, :up)
+    end.up
 
-    assert_equal 1, InheritedWare.db.nextval(:position)
-    assert_equal 2, InheritedWare.db.nextval(:position)
+    class Ware < Sequel::Model; end
+
+    assert_equal 1, Ware.db.nextval('position')
+    assert_equal 2, Ware.db.nextval('position')
+
+    class InheritedWare < Ware; end
+
+    assert_equal 3, InheritedWare.db.nextval(:position)
+    assert_equal 4, InheritedWare.db.nextval(:position)
   end
 
   test 'adds sequence starting at 100' do
-    Sequel.migration do
-      up do
+    with_migration do
+      def up
         create_sequence :position, start: 100
       end
-    end.apply(MysqlDB, :up)
+    end.up
 
-    assert_equal 100, Ware.db.nextval(:position)
-    assert_equal 101, Ware.db.nextval(:position)
+    assert_equal 100, MysqlDB.nextval(:position)
+    assert_equal 101, MysqlDB.nextval(:position)
   end
 
   test 'adds sequence incremented by 2' do
-    Sequel.migration do
-      up do
+    with_migration do
+      def up
         create_sequence :position, increment: 2
       end
-    end.apply(MysqlDB, :up)
+    end.up
 
-    assert_equal 1, Ware.db.nextval(:position)
-    assert_equal 3, Ware.db.nextval(:position)
+    assert_equal 1, MysqlDB.nextval(:position)
+    assert_equal 3, MysqlDB.nextval(:position)
   end
 
   test 'adds sequence incremented by 2 (using :step alias)' do
-    Sequel.migration do
-      up do
+    with_migration do
+      def up
         create_sequence :position, step: 2
       end
-    end.apply(MysqlDB, :up)
+    end.up
 
-    assert_equal 1, Ware.db.nextval(:position)
-    assert_equal 3, Ware.db.nextval(:position)
+    assert_equal 1, MysqlDB.nextval(:position)
+    assert_equal 3, MysqlDB.nextval(:position)
   end
 
   test 'returns current/last sequence value without incrementing it' do
-    Sequel.migration do
-      up do
+    with_migration do
+      def up
         create_sequence :position
       end
-    end.apply(MysqlDB, :up)
+    end.up
 
-    Ware.db.nextval(:position)
+    MysqlDB.nextval(:position)
 
-    assert_equal 1, Ware.db.currval(:position)
-    assert_equal 1, Ware.db.lastval(:position)
-    assert_equal 1, Ware.db.currval(:position)
-    assert_equal 1, Ware.db.lastval(:position)
+    assert_equal 1, MysqlDB.currval(:position)
+    assert_equal 1, MysqlDB.lastval(:position)
+    assert_equal 1, MysqlDB.currval(:position)
+    assert_equal 1, MysqlDB.lastval(:position)
   end
 
   test 'sets sequence value' do
-    Sequel.migration do
-      up do
+    with_migration do
+      def up
         create_sequence :position
       end
-    end.apply(MysqlDB, :up)
+    end.up
 
-    Ware.db.nextval(:position)
-    assert_equal Ware.db.currval(:position), 1
+    MysqlDB.nextval(:position)
+    assert_equal MysqlDB.currval(:position), 1
 
+    MysqlDB.setval(:position, 101)
     # in mariaDB, 'lastval' only works after 'nextval' rather than  'setval'
-    Ware.db.setval(:position, 101)
-    Ware.db.nextval(:position)
-    assert_equal Ware.db.lastval(:position), 102
+    assert_equal 1, MysqlDB.lastval(:position)
+
+    MysqlDB.nextval(:position)
+    # now the value is correct
+    assert_equal 102, MysqlDB.lastval(:position)
   end
 
   test 'drops sequence and check_sequences' do
-    Sequel.migration do
-      up do
+    with_migration do
+      def up
         create_sequence :position
       end
-    end.apply(MysqlDB, :up)
+    end.up
 
     sequence = MysqlDB.check_sequences.find_all do |seq|
       seq[:Tables_in_test] == 'position'
@@ -108,11 +119,11 @@ class MysqlSequenceTest < Minitest::Test
 
     assert_equal 1, sequence.size
 
-    Sequel.migration do
-      down do
+    with_migration do
+      def down
         drop_sequence :position
       end
-    end.apply(MysqlDB, :down)
+    end.down
 
     sequence = MysqlDB.check_sequences.find do |seq|
       seq[:sequence_name] == 'position'
@@ -127,15 +138,14 @@ class MysqlSequenceTest < Minitest::Test
     assert !list.include?('b')
     assert !list.include?('c')
 
-    Sequel.migration do
-      up do
+    with_migration do
+      def up
         drop_table :things, if_exists: true
-        # drop_table :masters, if_exists: true
         create_sequence :c
         create_sequence :a
         create_sequence :b
       end
-    end.apply(MysqlDB, :up)
+    end.up
 
     list = MysqlDB.check_sequences.map { |s| s[:Tables_in_test] }
     assert list.include?('a')
@@ -144,20 +154,20 @@ class MysqlSequenceTest < Minitest::Test
   end
 
   test 'creates table that references sequence' do
-    Sequel.migration do
-      up do
+    with_migration do
+      def up
         drop_table :builders, if_exists: true
         create_sequence :position_id, if_exists: false
         create_table :builders do
           primary_key :id
           String :name, text: true
-
-          # PostgreSQL uses bigint as the sequence's default type.
           Bignum :position, null: false
         end
         set_column_default_nextval :builders, :position, :position_id
       end
-    end.apply(MysqlDB, :up)
+    end.up
+
+    class Builder < Sequel::Model; end
 
     builder1 = Builder.create(name: 'Builder 1')
     pos1 = MysqlDB.currval(:position_id)

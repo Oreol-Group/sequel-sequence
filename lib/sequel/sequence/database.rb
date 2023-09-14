@@ -3,12 +3,12 @@
 module Sequel
   module Sequence
     module Database
-      # def custom_sequence?(_sequence_name)
-      #   false
-      # end
+      def custom_sequence?(_sequence_name)
+        raise Sequel::MethodNotAllowed, Sequel::MethodNotAllowed::METHOD_NOT_ALLOWED
+      end
 
       def check_sequences
-        []
+        raise Sequel::MethodNotAllowed, Sequel::MethodNotAllowed::METHOD_NOT_ALLOWED
       end
 
       def create_sequence(_name, _options = {})
@@ -20,10 +20,18 @@ module Sequel
       end
 
       def quote_name(name)
+        unless respond_to?(:quote_column_name, false)
+          raise Sequel::MethodNotAllowed, Sequel::MethodNotAllowed::METHOD_NOT_ALLOWED
+        end
+
         name.to_s.split('.', 2).map { |part| quote_column_name(part) }.join('.')
       end
 
       def quote(name)
+        unless respond_to?(:quote_sequence_name, false)
+          raise Sequel::MethodNotAllowed, Sequel::MethodNotAllowed::METHOD_NOT_ALLOWED
+        end
+
         name.to_s.split('.', 2).map { |part| quote_sequence_name(part) }.join('.')
       end
 
@@ -40,7 +48,7 @@ module Sequel
       alias lastval currval
 
       def setval(_name, _value)
-        raise AR::MethodNotAllowed, AR::MethodNotAllowed::METHOD_NOT_ALLOWED
+        raise Sequel::MethodNotAllowed, Sequel::MethodNotAllowed::METHOD_NOT_ALLOWED
       end
     end
   end

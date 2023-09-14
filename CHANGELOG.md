@@ -11,10 +11,12 @@ Prefix your message with one of the following:
 - [Security] in case of vulnerabilities.
 -->
 
-## v0.1.1 - 2023-09-13
+## v0.2.0 - 2023-09-13
 
 - [Added] CI features based on GitHub Actions.
-- [Fixed] README.
+- [Fixed] README.md
+- [Changed] for changes in existing functionality.
+- [Fixed] Sequel::Sequence::Database exceptions.
 
 ## v0.1.0 - 2023-09-10
 

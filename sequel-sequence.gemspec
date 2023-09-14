@@ -26,13 +26,13 @@ Gem::Specification.new do |spec|
   spec.platform              = Gem::Platform::RUBY
   spec.required_ruby_version = '>= 2.7.0'
 
-  spec.add_dependency 'sequel', '~> 5.28.0'
+  spec.add_dependency 'sequel', '>= 5.28', '<5.73'
   spec.add_development_dependency 'bundler', '>= 2.2.4'
   spec.add_development_dependency 'minitest-utils', '~> 0.4.6'
-  spec.add_development_dependency 'pry-byebug', '~> 3.8.0'
+  spec.add_development_dependency 'pry-byebug', '~> 3.10.1'
   spec.add_development_dependency 'rake', '~> 13.0.2'
-  spec.add_development_dependency 'rubocop', '~> 1.44.0'
-  spec.add_development_dependency 'simplecov', '~> 0.21.0'
+  spec.add_development_dependency 'rubocop', '~> 1.56.3'
+  spec.add_development_dependency 'simplecov', '~> 0.22.0'
   if RUBY_ENGINE == 'jruby'
     # JRuby Adapter Dependencies
     spec.add_development_dependency 'jdbc-mysql', '~> 8.0.17'
@@ -40,6 +40,6 @@ Gem::Specification.new do |spec|
   else
     # MRI/Rubinius Adapter Dependencies
     spec.add_development_dependency 'mysql2', '~> 0.5.3'
-    spec.add_development_dependency 'pg', '~> 1.2.0'
+    spec.add_development_dependency 'pg', '~> 1.5.4'
   end
 end
