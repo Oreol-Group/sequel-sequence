@@ -2,7 +2,14 @@
 
 require 'test_helper'
 
-MysqlDB = Sequel.connect('mysql2://root:root@localhost/test')
+MysqlDB = Sequel.connect(
+  adapter: 'mysql2',
+  user: ENV['TEST_MYSQL_USERNAME'] || 'root',
+  password: ENV['TEST_MYSQL_PASSWORD'] || 'root',
+  host: ENV['TEST_MYSQL_HOST'] || '127.0.0.1',
+  port: ENV['TEST_MYSQL_PORT'] || 3306,
+  database: ENV['TEST_MYSQL_DATABASE'] || 'test'
+)
 
 module MysqlTestHelper
   def recreate_table

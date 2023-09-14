@@ -75,6 +75,17 @@ jobs:
 
       - name: Run Tests
         run: bundle exec rake test
+        env:
+          TEST_POSTGRES_DATABASE: test
+          TEST_POSTGRES_HOST: localhost
+          TEST_POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+          TEST_POSTGRES_USERNAME: postgres
+          TEST_POSTGRES_PASSWORD: postgres
+          TEST_MYSQL_DATABASE: test
+          TEST_MYSQL_HOST: 127.0.0.1
+          TEST_MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
+          TEST_MYSQL_USERNAME: root
+          TEST_MYSQL_PASSWORD: root
 
       - name: Run Rubocop
         run: bundle exec rake rubocop

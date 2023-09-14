@@ -2,7 +2,14 @@
 
 require 'test_helper'
 
-PostgresqlDB = Sequel.connect('postgres://postgres:postgres@127.0.0.1:5432/test')
+PostgresqlDB = Sequel.connect(
+  adapter: 'postgres',
+  user: ENV['TEST_POSTGRES_USERNAME'] || 'postgres',
+  password: ENV['TEST_POSTGRES_PASSWORD'] || 'postgres',
+  host: ENV['TEST_POSTGRES_HOST'] || 'localhost',
+  port: ENV['TEST_POSTGRES_PORT'] || 5432,
+  database: ENV['TEST_POSTGRES_DATABASE'] || 'test'
+)
 
 module PostgresqlTestHelper
   def recreate_table
