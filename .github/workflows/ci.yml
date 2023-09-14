@@ -26,7 +26,8 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-        ports: ['5432:5432']
+        ports:
+        - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -36,7 +37,8 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
-        ports: ['3306:3306']
+        ports:
+        - 3306:3306
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval 10s
@@ -61,12 +63,15 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
 
-      - name: Create databases
+      - name: Create MySQL database
         run: |
           mysql -e 'create database test; use test; create table if not exists wares(id int auto_increment, primary key(id)); create table if not exists builders(id int auto_increment, primary key(id));' --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -proot
-          env PGPASSWORD=postgres psql -c 'create database test;' -h localhost -p ${{ job.services.postgres.ports[5432] }} -U postgres
-          env PGPASSWORD=postgres psql -d test -c 'create table things ();' -U postgres
-          env PGPASSWORD=postgres psql -d test -c 'create table masters ();' -U postgres
+
+      - name: Create PostgreSQL database
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -c 'create database "test";' -U postgres -h localhost -p ${{ job.services.postgres.ports[5432] }}
 
       - name: Run Tests
         run: bundle exec rake test
