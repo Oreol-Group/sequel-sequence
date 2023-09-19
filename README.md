@@ -3,6 +3,7 @@
 [![CI](https://github.com/oreol-group/sequel-sequence/actions/workflows/ci.yml/badge.svg)](https://github.com/oreol-group/sequel-sequence)
 [![Gem](https://img.shields.io/gem/v/sequel-sequence.svg)](https://rubygems.org/gems/sequel-sequence)
 [![Downloads total](https://img.shields.io/gem/dt/sequel-sequence.svg)](https://rubygems.org/profiles/it_architect)
+[![Code Climate](https://codeclimate.com/github/Oreol-Group/sequel-sequence.svg)](https://codeclimate.com/github/Oreol-Group/sequel-sequence)
 
 Adds a useful interface and support for PostgreSQL and MySQL `SEQUENCE` on Sequel migrations
 

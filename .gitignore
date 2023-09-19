@@ -11,4 +11,6 @@ log
 
 ## PROJECT::SPECIFIC
 .bundle
+.byebug_history
 Gemfile.lock
+*.gem
