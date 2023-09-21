@@ -72,7 +72,7 @@ class MysqlSequenceTest < Minitest::Test
     assert_equal 3, MysqlDB.nextval(:position)
   end
 
-  test 'returns current/last sequence value without incrementing it' do
+  test "returns current/last sequence value, which doesn't increase by itself" do
     with_migration do
       def up
         create_sequence :position
@@ -126,7 +126,7 @@ class MysqlSequenceTest < Minitest::Test
     end.down
 
     sequence = MysqlDB.check_sequences.find do |seq|
-      seq[:sequence_name] == 'position'
+      seq[:Tables_in_test] == 'position'
     end
 
     assert_nil sequence
@@ -157,7 +157,7 @@ class MysqlSequenceTest < Minitest::Test
     with_migration do
       def up
         drop_table :builders, if_exists: true
-        create_sequence :position_id, if_exists: false
+        create_sequence :position_id, if_exists: false, start: 1
         create_table :builders do
           primary_key :id
           String :name, text: true

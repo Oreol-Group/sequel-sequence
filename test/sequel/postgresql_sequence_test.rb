@@ -72,7 +72,7 @@ class PostgresqlSequenceTest < Minitest::Test
     assert_equal 3, PostgresqlDB.nextval(:position)
   end
 
-  test 'returns current (or last as alias) sequence value without incrementing it' do
+  test "returns current/last sequence value, which doesn't increase by itself" do
     with_migration do
       def up
         create_sequence :position, start: 2, increment: 2
@@ -164,7 +164,7 @@ class PostgresqlSequenceTest < Minitest::Test
     with_migration do
       def up
         drop_table :masters, if_exists: true
-        create_sequence :position_id, if_exists: false
+        create_sequence :position_id, if_exists: false, start: 1
         create_table :masters, if_not_exists: true do
           primary_key :id
           String :name, text: true

@@ -20,9 +20,10 @@ module Sequel
 
         def create_sequence(name, options = {})
           increment = options[:increment] || options[:step]
+          if_exists = build_exists_condition(options[:if_exists])
           name = quote_name(name.to_s)
 
-          sql = ["CREATE SEQUENCE IF NOT EXISTS #{name}"]
+          sql = ["CREATE SEQUENCE #{if_exists} #{name}"]
           sql << "INCREMENT BY #{increment}" if increment
           sql << "START WITH #{options[:start]}" if options[:start]
           sql << ';'
@@ -32,7 +33,7 @@ module Sequel
 
         def drop_sequence(name)
           name = quote_name(name.to_s)
-          sql = "DROP SEQUENCE #{name}"
+          sql = "DROP SEQUENCE IF EXISTS #{name}"
           run(sql)
         end
 

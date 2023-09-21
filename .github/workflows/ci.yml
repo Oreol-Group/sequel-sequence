@@ -86,6 +86,7 @@ jobs:
           TEST_MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
           TEST_MYSQL_USERNAME: root
           TEST_MYSQL_PASSWORD: root
-
+          TEST_SQLITE_DATABASE: "db/test.sqlite3"
+          
       - name: Run Rubocop
         run: bundle exec rake rubocop

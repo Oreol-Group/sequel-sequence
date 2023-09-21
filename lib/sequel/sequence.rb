@@ -4,6 +4,7 @@ require 'sequel/database'
 require 'sequel/adapters/postgres'
 # require 'sequel/adapters/mysql'
 require 'sequel/adapters/mysql2'
+require 'sequel/adapters/sqlite'
 require 'sequel/error'
 
 module Sequel
@@ -14,6 +15,7 @@ module Sequel
       require 'sequel/sequence/database/postgresql'
       # require "sequel/sequence/database/mysql"
       require 'sequel/sequence/database/mysql2'
+      require 'sequel/sequence/database/sqlite'
     end
   end
 end
@@ -30,3 +32,6 @@ Sequel::Mysql2::Database.include(
 # Sequel::Mysql::Database.include(
 #   Sequel::Sequence::Database::Mysql
 # )
+Sequel::SQLite::Database.include(
+  Sequel::Sequence::Database::SQLite
+)

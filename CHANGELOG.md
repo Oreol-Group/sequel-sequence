@@ -11,6 +11,13 @@ Prefix your message with one of the following:
 - [Security] in case of vulnerabilities.
 -->
 
+## v0.3.0 - 2023-09-21
+
+- [Added] A parametrized 'IF EXISTS' condition into the drop_sequence.
+- [Added] A parametrized 'IF NOT EXISTS' condition into the create_sequence.
+- [Added] Gem API support for SQLite databases.
+- [Fixed] Tests for the Mysql database.
+
 ## v0.2.0 - 2023-09-14
 
 - [Added] CI features based on GitHub Actions.

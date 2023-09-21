@@ -123,8 +123,19 @@ MariaDB [(none)]> USE test;
 MariaDB [test]> CREATE TABLE IF NOT EXISTS wares(id int auto_increment, primary key(id));
 MariaDB [test]> CREATE TABLE IF NOT EXISTS builders(id int auto_increment, primary key(id));
 ```
+- Add a test SQLite database:
+```bash
+mkdir db && touch db/test.sqlite3
+```
+- Add a couple of tables in the SQLite database:
+```bash
+sqlite3 db/test.sqlite3
+sqlite> create table objects(id integer primary key autoincrement);
+sqlite> create table apprentices(id integer primary key autoincrement);
+```
 - Run the tests separately:
 ```bash
 bundle exec rake TEST=test/sequel/postgresql_sequence_test.rb
 bundle exec rake TEST=test/sequel/mysql_sequence_test.rb
+bundle exec rake TEST=test/sequel/sqlite_sequence_test.rb
 ```

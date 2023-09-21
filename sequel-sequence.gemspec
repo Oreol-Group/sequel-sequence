@@ -37,9 +37,11 @@ Gem::Specification.new do |spec|
     # JRuby Adapter Dependencies
     spec.add_development_dependency 'jdbc-mysql', '~> 8.0.17'
     spec.add_development_dependency 'jdbc-postgres', '~> 42.2.14'
+    spec.add_development_dependency 'jdbc-sqlite3', '~> 3.42'
   else
     # MRI/Rubinius Adapter Dependencies
     spec.add_development_dependency 'mysql2', '~> 0.5.3'
     spec.add_development_dependency 'pg', '~> 1.5.4'
+    spec.add_development_dependency 'sqlite3', '~> 1.6.0'
   end
 end
