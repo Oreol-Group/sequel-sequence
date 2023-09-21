@@ -53,7 +53,7 @@ jobs:
 
       - name: Install db dependencies and check connections
         run: |
-          DEBIAN_FRONTEND="noninteractive" sudo apt-get install -yqq mysql-client libmysqlclient-dev postgresql-client libpq-dev sqlite
+          DEBIAN_FRONTEND="noninteractive" sudo apt-get install -yqq mysql-client libmysqlclient-dev postgresql-client libpq-dev
           mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -proot -e "SHOW GRANTS FOR 'root'@'localhost'"
           env PGPASSWORD=postgres psql -h localhost -p ${{ job.services.postgres.ports[5432] }} -U postgres -l
           sqlite3 --version
@@ -73,6 +73,10 @@ jobs:
           PGPASSWORD: postgres
         run: |
           psql -c 'create database "test";' -U postgres -h localhost -p ${{ job.services.postgres.ports[5432] }}
+
+      - name: Create SQLite database
+        run: |
+          mkdir ./db && touch ./db/test.sqlite3 && sqlite3 ./db/test.sqlite3
 
       - name: Run Tests
         run: bundle exec rake test

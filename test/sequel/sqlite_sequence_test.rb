@@ -223,34 +223,34 @@ class SqliteSequenceTest < Minitest::Test
   test 'creates table that references sequence' do
     with_migration do
       def up
-        drop_table :builders, if_exists: true
+        drop_table :apprentices, if_exists: true
         create_sequence :position_id, if_exists: false, start: 1
-        create_table :builders do
+        create_table :apprentices do
           primary_key :id
           String :name, text: true
           Bignum :position
         end
-        set_column_default_nextval :builders, :position, :position_id
+        set_column_default_nextval :apprentices, :position, :position_id
       end
     end.up
 
-    class Builder < Sequel::Model; end
+    class Apprentice < Sequel::Model; end
 
-    builder1 = Builder.create(name: 'Builder 1')
+    apprentice1 = Apprentice.create(name: 'Apprentice 1')
     pos1 = SQLiteDB.lastval(:position_id) - 1
-    assert_equal pos1, builder1.reload.position
+    assert_equal pos1, apprentice1.reload.position
 
-    builder2 = Builder.create(name: 'Builder 2')
+    apprentice2 = Apprentice.create(name: 'Apprentice 2')
     pos2 = SQLiteDB.currval(:position_id) - 1
-    assert_equal pos2, builder2.reload.position
+    assert_equal pos2, apprentice2.reload.position
 
     assert_equal pos2 - pos1, 1
 
     SQLiteDB.nextval(:position_id)
 
-    builder4 = Builder.create(name: 'Builder 4')
+    apprentice4 = Apprentice.create(name: 'Apprentice 4')
     pos4 = SQLiteDB.currval(:position_id) - 1
-    assert_equal pos4, builder4.reload.position
+    assert_equal pos4, apprentice4.reload.position
 
     assert_equal pos4 - pos2, 2
   end
