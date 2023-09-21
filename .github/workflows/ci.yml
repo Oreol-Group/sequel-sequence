@@ -87,6 +87,6 @@ jobs:
           TEST_MYSQL_USERNAME: root
           TEST_MYSQL_PASSWORD: root
           TEST_SQLITE_DATABASE: "db/test.sqlite3"
-          
+
       - name: Run Rubocop
         run: bundle exec rake rubocop

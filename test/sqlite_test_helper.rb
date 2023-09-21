@@ -3,8 +3,8 @@
 require 'test_helper'
 require 'logger'
 
-SQLiteDB = Sequel.sqlite(
-  ENV['TEST_SQLITE_DATABASE'] || 'db/test.sqlite3',
+SQLiteDB = Sequel.connect(
+  "sqlite://#{ENV.fetch('TEST_SQLITE_DATABASE', nil) || 'db/test.sqlite3'}",
   loggers: [Logger.new($stdout)]
 )
 
