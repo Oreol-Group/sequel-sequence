@@ -98,7 +98,7 @@ class MysqlSequenceTest < Minitest::Test
     assert_equal MysqlDB.currval(:position), 1
 
     MysqlDB.setval(:position, 101)
-    # in mariaDB, 'lastval' only works after 'nextval' rather than  'setval'
+    # in MariaDB, 'lastval' only works after 'nextval' rather than  'setval'
     assert_equal 1, MysqlDB.lastval(:position)
 
     MysqlDB.nextval(:position)

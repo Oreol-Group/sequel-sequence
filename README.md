@@ -5,7 +5,7 @@
 [![Downloads total](https://img.shields.io/gem/dt/sequel-sequence.svg)](https://rubygems.org/profiles/it_architect)
 [![Code Climate](https://codeclimate.com/github/Oreol-Group/sequel-sequence.svg)](https://codeclimate.com/github/Oreol-Group/sequel-sequence)
 
-Adds a useful interface and support for PostgreSQL and MySQL `SEQUENCE` on Sequel migrations. Gem includes functionality to cover the needs of SQLite users as well.
+Adds a useful interface for PostgreSQL and MariaDB `SEQUENCE` on Sequel migrations. This Gem includes functionality to meet the needs of MySQL and SQLite users as well.
 
 ## Installation
 
@@ -21,12 +21,25 @@ gem "sequel-sequence"
 
 ## Usage with PostgreSQL and MariaDB
 
-To create a `SEQUENCE`, just use the method `create_sequence`.
+To create and delete a `SEQUENCE`, simply use the `create_sequence` and `drop_sequence` methods.
 
 ```ruby
 Sequel.migration do
   up do
     create_sequence :position, if_exists: false
+  end
+
+  down do
+    drop_sequence :position, if_exists: true
+  end
+end
+```
+
+It would also be correct to write:
+```ruby
+Sequel.migration do
+  up do
+    create_sequence :position
   end
 
   down do
@@ -39,16 +52,19 @@ You can also specify the initial value and increment:
 
 ```ruby
 create_sequence :position, increment: 2
+create_sequence :position, step: 2
 create_sequence :position, start: 100
 create_sequence :position, if_exists: false
 ```
+
+The `increment` and `step` parameters have the same meaning. By default their values are 1. The default value of `start` is 1 as well.
 
 To define a column that has a sequence as its default value, use something like the following:
 
 ```ruby
 Sequel.migration do
   change do
-    create_sequence :position_id, if_exists: false, start: 1
+    create_sequence :position_id, if_exists: false, start: 1000
 
     create_table(:things) do
       primary_key :id
@@ -85,13 +101,13 @@ DB.setval("position", 1234)
 
 ## Usage with SQLite
 
-In SQLite, the sequence functionality is implemented by registering tables in the database with a primary key of `id` and an additional integer field `fiction`.
+The sequence functionality for SQLite or MySQL databases is implemented by registering tables in the database with a primary key of `id` and an additional integer field `fiction`.
 ```sql
 CREATE TABLE `name_of_your_sequence_table`
 (id integer primary key autoincrement, fiction integer);
 ```
 
-You might utilize the last one as a numeric label to collect statistics on the operation of the end-to-end counter `"name_of_your_sequence_table".id` within the application. 
+You might utilize the last field as a numeric label to collect statistics on the operation of the end-to-end counter `"name_of_your_sequence_table".id` within the application. 
 
 ```ruby
 DB.nextval_with_label("position", 1)
@@ -99,7 +115,7 @@ DB.nextval_with_label("position", 1)
 
 By default, `fiction` has a zero value.
 
-Otherwise, the operation of this gem for SQLite is identical to the ways of using Sequence in more advanced databases.
+Otherwise, the operation of this gem for SQLite and MySQL is similar to the ways of using Sequence in more advanced DBMS. There is only one difference here, you won't be able to change the increment value from 1 to another using the `increment` or `step` parameter.
 
 ## Maintainer
 

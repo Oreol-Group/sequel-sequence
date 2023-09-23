@@ -53,12 +53,12 @@ module Sequel
         raise Sequel::MethodNotAllowed, Sequel::MethodNotAllowed::METHOD_NOT_ALLOWED
       end
 
-      # for connection.adapter_name = "PostgreSQL"
+      # for Postgres
       def currval(_name)
         raise Sequel::MethodNotAllowed, Sequel::MethodNotAllowed::METHOD_NOT_ALLOWED
       end
 
-      # for connection.adapter_name = "Mysql2"
+      # for MariaDB
       alias lastval currval
 
       def setval(_name, _value)

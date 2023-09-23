@@ -10,6 +10,8 @@ MysqlDB = Sequel.connect(
   port: ENV['TEST_MYSQL_PORT'] || 3306,
   database: ENV['TEST_MYSQL_DATABASE'] || 'test'
 )
+# puts "Sequel::Database/test/ mariadb? = #{MysqlDB.mariadb?.inspect}"
+# puts "Sequel::Database/test/ server_version = #{MysqlDB.server_version.inspect}"
 
 module MysqlTestHelper
   def recreate_table

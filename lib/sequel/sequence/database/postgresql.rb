@@ -62,7 +62,7 @@ module Sequel
           out
         end
 
-        # for db.database_type = :postgres
+        # for Postgres
         def currval(name)
           name = quote(name.to_s)
           out = nil
@@ -72,7 +72,7 @@ module Sequel
           out
         end
 
-        # for db.database_type = :mysql2
+        # for MariaDB
         alias lastval currval
 
         def setval(name, value)

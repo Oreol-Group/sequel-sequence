@@ -11,6 +11,12 @@ Prefix your message with one of the following:
 - [Security] in case of vulnerabilities.
 -->
 
+## v0.4.0 - 2023-09-23
+
+- [Fixed] Differences between MySQL and MariaDB.
+- [Added] Gem API support for MySQL databases.
+- [Changed] README.md and .gemspec description.
+
 ## v0.3.0 - 2023-09-21
 
 - [Added] A parametrized 'IF EXISTS' condition into the drop_sequence.

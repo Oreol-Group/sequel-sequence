@@ -7,10 +7,11 @@ Gem::Specification.new do |spec|
   spec.version               = Sequel::Sequence::VERSION
   spec.licenses              = ['MIT']
   spec.summary               = \
-    "Add support for PostgreSQL's and MySQL's SEQUENCE on Sequel migrations."
+    'Adds SEQUENCE support to Sequel for migrations to PostgreSQL, MariaDB, MySQL and SQLite.'
   spec.description           = <<-DES
     This gem provides a single interface for SEQUENCE functionality
-    in Postgresql and Mysql databases within the Sequel ORM.
+    in Postgresql and MariaDB DBMS within the Sequel ORM.
+    It also models the Sequences to meet the needs of SQLite and MySQL users.
   DES
   spec.authors               = ['Nikolai Bocharov']
   spec.email                 = ['it.architect@yahoo.com']
