@@ -34,6 +34,17 @@ jobs:
           --health-timeout 5s
           --health-retries 5
       mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ROOT_PASSWORD: rootroot
+        ports:
+        - 3360:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+      mariadb:
         image: mariadb:11.1
         env:
           MARIADB_ROOT_PASSWORD: root
@@ -54,7 +65,8 @@ jobs:
       - name: Install db dependencies and check connections
         run: |
           DEBIAN_FRONTEND="noninteractive" sudo apt-get install -yqq mysql-client libmysqlclient-dev postgresql-client libpq-dev
-          mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -proot -e "SHOW GRANTS FOR 'root'@'localhost'"
+          mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports[3360] }} -uroot -prootroot -e "SHOW GRANTS FOR 'root'@'localhost'"
+          mysql --host 127.0.0.1 --port ${{ job.services.mariadb.ports[3306] }} -uroot -proot -e "SHOW GRANTS FOR 'root'@'localhost'"
           env PGPASSWORD=postgres psql -h localhost -p ${{ job.services.postgres.ports[5432] }} -U postgres -l
           sqlite3 --version
 
@@ -66,7 +78,11 @@ jobs:
 
       - name: Create MySQL database
         run: |
-          mysql -e 'create database test; use test; create table if not exists wares(id int auto_increment, primary key(id)); create table if not exists builders(id int auto_increment, primary key(id));' --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -proot
+          mysql -e 'create database test; use test; create table if not exists stuffs(id int auto_increment primary key; create table if not exists creators(id int auto_increment primary key;' --host 127.0.0.1 --port ${{ job.services.mysql.ports[3360] }} -uroot -prootroot
+
+      - name: Create MariaDB database
+        run: |
+          mysql -e 'create database test; use test; create table if not exists wares(id int auto_increment, primary key(id)); create table if not exists builders(id int auto_increment, primary key(id));' --host 127.0.0.1 --port ${{ job.services.mariadb.ports[3306] }} -uroot -proot
 
       - name: Create PostgreSQL database
         env:
@@ -78,19 +94,36 @@ jobs:
         run: |
           mkdir ./db && touch ./db/test.sqlite3 && sqlite3 ./db/test.sqlite3
 
-      - name: Run Tests
-        run: bundle exec rake test
+      - name: Run MariaDB Tests
+        run: bundle exec rake TEST=test/sequel/mariadb_sequence_test.rb
+        env:
+          TEST_MARIA_DATABASE: test
+          TEST_MARIA_HOST: 127.0.0.1
+          TEST_MARIA_PORT: ${{ job.services.mariadb.ports[3306] }}
+          TEST_MARIA_USERNAME: root
+          TEST_MARIA_PASSWORD: root
+
+      - name: Run PostgreSQL Tests
+        run: bundle exec rake TEST=test/sequel/postgresql_sequence_test.rb
         env:
           TEST_POSTGRES_DATABASE: test
           TEST_POSTGRES_HOST: localhost
           TEST_POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
           TEST_POSTGRES_USERNAME: postgres
           TEST_POSTGRES_PASSWORD: postgres
+
+      - name: Run MySQL Tests
+        run: bundle exec rake TEST=test/sequel/mysql_sequence_test.rb
+        env:
           TEST_MYSQL_DATABASE: test
           TEST_MYSQL_HOST: 127.0.0.1
-          TEST_MYSQL_PORT: ${{ job.services.mysql.ports[3306] }}
+          TEST_MYSQL_PORT: ${{ job.services.mysql.ports[3360] }}
           TEST_MYSQL_USERNAME: root
-          TEST_MYSQL_PASSWORD: root
+          TEST_MYSQL_PASSWORD: rootroot
+
+      - name: Run SQLite Tests
+        run: bundle exec rake TEST=test/sequel/sqlite_sequence_test.rb
+        env:
           TEST_SQLITE_DATABASE: "db/test.sqlite3"
 
       - name: Run Rubocop

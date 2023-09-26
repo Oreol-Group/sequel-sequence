@@ -67,14 +67,21 @@ your contribution is according to how this project works.
 - This project uses [Rubocop](https://rubocop.org) to enforce code style. Before
   submitting your changes, make sure your tests are passing and code conforms to
   the expected style by running `rake`.
+```bash
+$ bundle exec rake rubocop
+```
 - Do not change the library version. This will be done by the maintainer
   whenever a new version is about to be released.
 
-### Ruby tests
+## Ruby tests
+
+Key points in preparing RDBMS and using tests.
+
+### Preparing a PostgreSQL database
 
 - Make sure you have a test PostgreSQL database:
 ```bash
-sudo psql -U USER_NAME -d test
+$ sudo psql -U USER_NAME -d test
 test=# \dt
           List of relations
  Schema |  Name   | Type  |   Owner   
@@ -84,28 +91,31 @@ test=# \dt
 ```
 and role `postgres`
 ```bash
-psql -d test -c 'SELECT rolname FROM pg_roles;'
+$ psql -d test -c 'SELECT rolname FROM pg_roles;'
           rolname          
 ---------------------------
  postgres
 ```
 - If none of them exist, create role
 ```bash
-psql -d postgres -c "create role postgres superuser createdb login password 'postgres';"
+$ psql -d postgres -c "create role postgres superuser createdb login password 'postgres';"
 ```
 and database with a couple of tables:
 
 ```bash
-sudo psql -U postgres -d postgres
+$ sudo psql -U postgres -d postgres
 postgres=# CREATE DATABASE test;
 postgres=# \c test
 test=# CREATE TABLE IF NOT EXISTS things ();
 test=# CREATE TABLE IF NOT EXISTS masters ();
 test=# \q
 ```
-- Make sure you have a test MySQL database:
+
+### Preparing a MariaDB database
+
+- Make sure you have a test MariaDB database:
 ```bash
-mysql
+$ mysql
 MariaDB [(none)]> show databases;
 MariaDB [(none)]> USE test;
 MariaDB [test]> SHOW TABLES;
@@ -123,19 +133,106 @@ MariaDB [(none)]> USE test;
 MariaDB [test]> CREATE TABLE IF NOT EXISTS wares(id int auto_increment, primary key(id));
 MariaDB [test]> CREATE TABLE IF NOT EXISTS builders(id int auto_increment, primary key(id));
 ```
+
+### Preparing a MySQL database
+
+The optimal way to share Mysql and MariaDB on the same computer is to utilize docker containers.
+
+- Check the local availability of a Mysql container:
+```bash
+$ docker image ls
+REPOSITORY          TAG             IMAGE ID       CREATED         SIZE
+mysql               latest          3503aa5f0751   2 days ago      599MB
+```
+- If there is no distribution package download the docker container with Mysql to the local computer:
+```bash
+$ docker run -p 3360:3306 --name test_mysql  -e MYSQL_ROOT_PASSWORD=rootroot -d mysql:latest
+```
+- Show running containers:
+```bash
+$ docker container ls      
+CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS          PORTS                               NAMES
+a0d3476699f4   mysql:latest   "docker-entrypoint.s…"   17 minutes ago   Up 11 seconds   33060/tcp, 0.0.0.0:3360->3306/tcp   test_mysql
+```
+- Launch the MySQL container if it is still not running:
+```bash
+$ docker start test_mysql
+```
+
+To create a new database for tests, you could run the MySQL client in the terminal as follows:
+
+- Check the IP address of the running MySQL server:
+```bash
+$ docker inspect test_mysql
+...
+  "IPAddress": "172.17.0.2",
+...
+```
+- Run the MySQL client:
+```bash
+$ docker run -e MYSQL_ROOT_PASSWORD=rootroot -it mysql /bin/bash
+bash-4.4#
+```
+- Launch the MySQL shell:
+```bash
+bash-4.4# mysql -h 172.17.0.2 -u root  -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 8
+Server version: 8.1.0 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2023, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql>
+```
+- Make sure that the test database is available:
+```bash
+mysql> show schemas;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
+| test               |
++--------------------+
+```
+- If the test danabase doesn't exists, create it:
+```bash
+mysql> CREATE DATABASE test;
+```
+- Create a couple of tables:
+```bash
+mysql> USE test;
+mysql> CREATE TABLE IF NOT EXISTS stuffs(id int auto_increment, primary key(id));
+mysql> CREATE TABLE IF NOT EXISTS creators(id int auto_increment, primary key(id));
+```
+
+### Preparing a SQLite database
+
 - Add a test SQLite database:
 ```bash
-mkdir db && touch db/test.sqlite3
+$ mkdir db && touch db/test.sqlite3
 ```
 - Add a couple of tables in the SQLite database:
 ```bash
-sqlite3 db/test.sqlite3
+$ sqlite3 db/test.sqlite3
 sqlite> create table objects(id integer primary key autoincrement);
 sqlite> create table apprentices(id integer primary key autoincrement);
 ```
-- Run the tests separately:
+
+### Running tests:
+
 ```bash
-bundle exec rake TEST=test/sequel/postgresql_sequence_test.rb
-bundle exec rake TEST=test/sequel/mysql_sequence_test.rb
-bundle exec rake TEST=test/sequel/sqlite_sequence_test.rb
+$ bundle exec rake TEST=test/sequel/postgresql_sequence_test.rb
+$ bundle exec rake TEST=test/sequel/mariadb_sequence_test.rb
+$ bundle exec rake TEST=test/sequel/mysql_sequence_test.rb
+$ bundle exec rake TEST=test/sequel/sqlite_sequence_test.rb
 ```

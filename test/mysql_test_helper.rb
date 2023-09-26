@@ -5,22 +5,22 @@ require 'test_helper'
 MysqlDB = Sequel.connect(
   adapter: 'mysql2',
   user: ENV['TEST_MYSQL_USERNAME'] || 'root',
-  password: ENV['TEST_MYSQL_PASSWORD'] || 'root',
-  host: ENV['TEST_MYSQL_HOST'] || '127.0.0.1',
-  port: ENV['TEST_MYSQL_PORT'] || 3306,
+  password: ENV['TEST_MYSQL_PASSWORD'] || 'rootroot',
+  host: ENV['TEST_MYSQL_HOST'] || '0.0.0.0',
+  port: ENV['TEST_MYSQL_PORT'] || 3360,
   database: ENV['TEST_MYSQL_DATABASE'] || 'test'
 )
-# puts "Sequel::Database/test/ mariadb? = #{MysqlDB.mariadb?.inspect}"
-# puts "Sequel::Database/test/ server_version = #{MysqlDB.server_version.inspect}"
 
 module MysqlTestHelper
   def recreate_table
-    MysqlDB.run 'DROP SEQUENCE IF EXISTS position'
-    MysqlDB.run 'DROP TABLE IF EXISTS wares'
-    MysqlDB.run 'DROP SEQUENCE IF EXISTS a'
-    MysqlDB.run 'DROP SEQUENCE IF EXISTS b'
-    MysqlDB.run 'DROP SEQUENCE IF EXISTS c'
-    sql = 'CREATE TABLE wares (id INT AUTO_INCREMENT, slug VARCHAR(255), quantity INT DEFAULT(0), PRIMARY KEY(id));'
+    MysqlDB.drop_table :creators, if_exists: true
+    MysqlDB.drop_sequence :position_id, if_exists: true
+    MysqlDB.drop_sequence :position
+    MysqlDB.drop_table :stuffs, if_exists: true
+    MysqlDB.drop_sequence 'a'
+    MysqlDB.drop_sequence 'b'
+    MysqlDB.drop_sequence 'c'
+    sql = 'CREATE TABLE stuffs (id INT AUTO_INCREMENT PRIMARY KEY, slug VARCHAR(255), quantity INT DEFAULT(0));'
     MysqlDB.run sql
   end
 

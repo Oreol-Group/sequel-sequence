@@ -7,7 +7,15 @@ require 'rubocop/rake_task'
 Rake::TestTask.new(:test) do |t|
   t.libs << 'test'
   t.libs << 'lib'
-  t.test_files = FileList['test/**/*_test.rb']
+  t.test_files = FileList['test/sequel/postgresql_sequence_test.rb',
+                          'test/sequel/mariadb_sequence_test.rb',
+                          'test/sequel/sqlite_sequence_test.rb']
+end
+
+Rake::TestTask.new(:mysql) do |t|
+  t.libs << 'test'
+  t.libs << 'lib'
+  t.test_files = FileList['test/sequel/mysql_sequence_test.rb']
 end
 
 RuboCop::RakeTask.new

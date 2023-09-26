@@ -18,7 +18,7 @@ module Mariadb
     if_exists = build_exists_condition(options[:if_exists])
     name = quote_name(name.to_s)
 
-    sql = ["CREATE SEQUENCE #{if_exists} #{name}"]
+    sql = ["CREATE SEQUENCE #{if_exists || Sequel::Database::IF_NOT_EXISTS} #{name}"]
     sql << "INCREMENT BY #{increment}" if increment
     sql << "START WITH #{options[:start]}" if options[:start]
     sql << ';'

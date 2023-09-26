@@ -10,7 +10,8 @@ SQLiteDB = Sequel.connect(
 
 module SqliteTestHelper
   def recreate_table
-    SQLiteDB.drop_sequence 'position'
+    SQLiteDB.drop_sequence :position
+    SQLiteDB.drop_sequence :position_id, if_exists: true
     SQLiteDB.run 'DROP TABLE IF EXISTS objects'
     SQLiteDB.drop_sequence 'a'
     SQLiteDB.drop_sequence 'b'

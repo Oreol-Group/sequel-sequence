@@ -14,8 +14,11 @@ module Sequel
           check_options(options)
           if_exists = build_exists_condition(options[:if_exists])
           start_option = options[:start] || 1
+          num_label = options[:numeric_label] || 0
+          return if (current = lastval(name)) && (current >= start_option)
+
           sql = [create_sequence_table(stringify(name), if_exists)]
-          sql << insert_into_sqlite_sequence(stringify(name), start_option)
+          sql << insert_into_sequence_table_init_values(stringify(name), start_option, num_label)
           run(sql.join("\n"))
         end
 
@@ -26,12 +29,12 @@ module Sequel
 
         def nextval(name)
           run(insert_into_sequence_table(stringify(name), 0))
-          take_seq(name)
+          take_seq(stringify(name))
         end
 
         def nextval_with_label(name, num_label = 0)
           run(insert_into_sequence_table(stringify(name), num_label))
-          take_seq(name)
+          take_seq(stringify(name))
         end
 
         def lastval(name)
@@ -85,6 +88,10 @@ module Sequel
           )
         end
 
+        def insert_into_sequence_table_init_values(name, start_id, num_label)
+          "INSERT INTO #{name} (id, fiction) VALUES (#{start_id}, #{num_label});"
+        end
+
         def insert_into_sequence_table(name, num_label)
           "INSERT INTO #{name} (fiction) VALUES (#{num_label});"
         end
@@ -119,7 +126,7 @@ module Sequel
             CREATE TRIGGER IF NOT EXISTS #{table}_#{sequence} AFTER INSERT
             ON #{table}
             BEGIN
-              INSERT INTO #{sequence}(fiction) VALUES (0);
+              INSERT INTO #{sequence} (fiction) VALUES (0);
               UPDATE #{table}
               SET #{column} = (SELECT MAX(seq) FROM sqlite_sequence WHERE name = '#{sequence}')
               WHERE rowid = NEW.rowid;

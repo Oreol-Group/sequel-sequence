@@ -99,7 +99,7 @@ DB.lastval("position")
 DB.setval("position", 1234)
 ```
 
-## Usage with SQLite
+## Usage with SQLite and MySQL
 
 The sequence functionality for SQLite or MySQL databases is implemented by registering tables in the database with a primary key of `id` and an additional integer field `fiction`.
 ```sql
@@ -108,14 +108,17 @@ CREATE TABLE `name_of_your_sequence_table`
 ```
 
 You might utilize the last field as a numeric label to collect statistics on the operation of the end-to-end counter `"name_of_your_sequence_table".id` within the application. 
-
 ```ruby
-DB.nextval_with_label("position", 1)
+create_sequence :position, if_exists: false, start: 1000, numeric_label: 1
+```
+and
+```ruby
+DB.nextval_with_label(:position, 1)
 ```
 
 By default, `fiction` has a zero value.
 
-Otherwise, the operation of this gem for SQLite and MySQL is similar to the ways of using Sequence in more advanced DBMS. There is only one difference here, you won't be able to change the increment value from 1 to another using the `increment` or `step` parameter.
+Otherwise, the operation of this gem for SQLite and MySQL is similar to the ways of using Sequence in more advanced RDBMS. There is only one difference here, you won't be able to change the increment value from 1 to another using the `increment` or `step` parameter.
 
 ## Maintainer
 

@@ -35,3 +35,6 @@ Style/Documentation:
 Lint/ConstantDefinitionInBlock:
   Exclude:
     - test/**/*
+
+Metrics/ModuleLength:
+  Max: 150

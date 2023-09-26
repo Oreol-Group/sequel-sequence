@@ -12,7 +12,7 @@ class SqliteSequenceTest < Minitest::Test
   test 'adds sequence with default values' do
     with_migration do
       def up
-        # create_sequence :position, {start: 1, increment: 1} - default values
+        # create_sequence :position, {start: 1, increment: 1, numeric_label: 0} - default values
         create_sequence :position
       end
     end.up
@@ -126,8 +126,7 @@ class SqliteSequenceTest < Minitest::Test
     SQLiteDB.setval(:position, 1)
     assert_equal 101, SQLiteDB.lastval(:position)
 
-    SQLiteDB.nextval(:position)
-    assert_equal 102, SQLiteDB.lastval(:position)
+    assert_equal 102, SQLiteDB.nextval(:position)
   end
 
   test 'sets a new sequence value with a label' do
@@ -143,8 +142,9 @@ class SqliteSequenceTest < Minitest::Test
     fiction_set_size = SQLiteDB.fetch('SELECT * FROM position where fiction = 1;').all.size
     assert_equal 2, fiction_set_size
 
+    # create_sequence + nextval
     fiction_set_size = SQLiteDB.fetch('SELECT * FROM position where fiction = 0;').all.size
-    assert_equal 1, fiction_set_size
+    assert_equal 2, fiction_set_size
   end
 
   test 'drops the sequence and the check_sequences' do
@@ -173,7 +173,7 @@ class SqliteSequenceTest < Minitest::Test
     assert_nil sequence
   end
 
-  test 'dropsthe sequence with the parameter if_exists' do
+  test 'drops the sequence with the parameter if_exists' do
     with_migration do
       def up
         create_sequence :position
@@ -218,6 +218,78 @@ class SqliteSequenceTest < Minitest::Test
     assert list.include?('a')
     assert list.include?('b')
     assert list.include?('c')
+  end
+
+  test 'recreates the same sequence with the same start value' do
+    with_migration do
+      def up
+        create_sequence :position_id, if_exists: false, start: 1
+      end
+    end.up
+
+    assert_equal 1, SQLiteDB.currval(:position_id)
+
+    fiction_set_size = SQLiteDB.fetch('SELECT * FROM position_id where fiction = 0;').all.size
+    assert_equal 1, fiction_set_size
+
+    with_migration do
+      def up
+        create_sequence :position_id, if_exists: false, start: 1
+      end
+    end.up
+
+    assert_equal 1, SQLiteDB.currval(:position_id)
+
+    fiction_set_size = SQLiteDB.fetch('SELECT * FROM position_id where fiction = 0;').all.size
+    assert_equal 1, fiction_set_size
+  end
+
+  test 'recreates the same sequence with a smaller start value' do
+    with_migration do
+      def up
+        create_sequence :position_id, if_exists: false, start: 100
+      end
+    end.up
+
+    assert_equal 100, SQLiteDB.currval(:position_id)
+
+    fiction_set_size = SQLiteDB.fetch('SELECT * FROM position_id where fiction = 0;').all.size
+    assert_equal 1, fiction_set_size
+
+    with_migration do
+      def up
+        create_sequence :position_id, if_exists: false, start: 1
+      end
+    end.up
+
+    assert_equal 100, SQLiteDB.currval(:position_id)
+
+    fiction_set_size = SQLiteDB.fetch('SELECT * FROM position_id where fiction = 0;').all.size
+    assert_equal 1, fiction_set_size
+  end
+
+  test 'recreates the same sequence with a greater start value' do
+    with_migration do
+      def up
+        create_sequence :position_id, if_exists: false, start: 1
+      end
+    end.up
+
+    assert_equal 1, SQLiteDB.currval(:position_id)
+
+    fiction_set_size = SQLiteDB.fetch('SELECT * FROM position_id where fiction = 0;').all.size
+    assert_equal 1, fiction_set_size
+
+    with_migration do
+      def up
+        create_sequence :position_id, if_exists: false, start: 100
+      end
+    end.up
+
+    assert_equal 100, SQLiteDB.currval(:position_id)
+
+    fiction_set_size = SQLiteDB.fetch('SELECT * FROM position_id where fiction = 0;').all.size
+    assert_equal 2, fiction_set_size
   end
 
   test 'creates table that references sequence' do

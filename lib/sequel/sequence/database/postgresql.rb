@@ -2,6 +2,7 @@
 
 # https://sequel.jeremyevans.net/rdoc/files/doc/sql_rdoc.html
 # https://github.com/jeremyevans/sequel/blob/master/lib/sequel/database/connecting.rb
+# See information about  disable_insert_returning in https://github.com/jeremyevans/sequel/blob/master/doc/release_notes/4.9.0.txt
 module Sequel
   module Sequence
     module Database

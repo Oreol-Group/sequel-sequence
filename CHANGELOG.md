@@ -11,11 +11,12 @@ Prefix your message with one of the following:
 - [Security] in case of vulnerabilities.
 -->
 
-## v0.4.0 - 2023-09-24
+## v0.4.0 - 2023-09-26
 
 - [Fixed] Differences between MySQL and MariaDB.
 - [Added] Gem API support for MySQL databases.
-- [Changed] README.md and .gemspec description.
+- [Changed] README.md, CONTRIBUTING.md and .gemspec description.
+- [Fixed] Some API support for SQLite databases.
 
 ## v0.3.0 - 2023-09-21
 
