@@ -78,7 +78,7 @@ jobs:
 
       - name: Create MySQL database
         run: |
-          mysql -e 'create database test; use test; create table if not exists stuffs(id int auto_increment primary key; create table if not exists creators(id int auto_increment primary key;' --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -prootroot
+          mysql -e 'create database test;' --host 127.0.0.1 --port ${{ job.services.mysql.ports[3306] }} -uroot -prootroot
 
       # - name: Create MariaDB database
       #   run: |
