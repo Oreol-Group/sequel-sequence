@@ -38,7 +38,7 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: rootroot
         ports:
-        - 3306:3360
+        - 3360:3306
         options: >-
           --health-cmd="healthcheck.sh --connect --innodb_initialized"
           --health-interval 10s
