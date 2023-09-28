@@ -235,4 +235,5 @@ $ bundle exec rake TEST=test/sequel/postgresql_sequence_test.rb
 $ bundle exec rake TEST=test/sequel/mariadb_sequence_test.rb
 $ bundle exec rake TEST=test/sequel/mysql_sequence_test.rb
 $ bundle exec rake TEST=test/sequel/sqlite_sequence_test.rb
+$ bundle exec rake TEST=test/sequel/mock_sequence_test.rb
 ```

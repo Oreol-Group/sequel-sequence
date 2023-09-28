@@ -11,13 +11,12 @@ Prefix your message with one of the following:
 - [Security] in case of vulnerabilities.
 -->
 
-## In progress
+## v0.4.1 - 2023-09-28
 
 - [Added] Important notice to README.md.
 - [Added] MySQL tests cover 100%.
 - [Added] SQLite tests cover 100%.
 - [Added] Mock connection to check for additional ORM exceptions.
-
 
 ## v0.4.0 - 2023-09-26
 
