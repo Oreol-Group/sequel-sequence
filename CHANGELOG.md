@@ -15,6 +15,7 @@ Prefix your message with one of the following:
 
 - [Added] Important notice to README.md.
 - [Added] MySQL tests cover almost 100%.
+- [Changed] Specify test suite names for SimpleCov
 
 ## v0.4.0 - 2023-09-26
 
