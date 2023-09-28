@@ -126,5 +126,8 @@ jobs:
         env:
           TEST_SQLITE_DATABASE: "db/test.sqlite3"
 
+      - name: Run Mock Tests
+        run: bundle exec rake TEST=test/sequel/mock_sequence_test.rb
+
       - name: Run Rubocop
         run: bundle exec rake rubocop
