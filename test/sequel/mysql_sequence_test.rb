@@ -352,4 +352,20 @@ class MysqlSequenceTest < Minitest::Test
 
     assert_equal pos4 - pos2, 2
   end
+
+  test "catches a Mysql2::Error: «Table mysql_sequence doesn't exist»" do
+    assert !sequence_table_exists?('position')
+
+    MysqlDB.drop_table :mysql_sequence, if_exists: true
+
+    last_number = MysqlDB.lastval(:position)
+    assert_nil last_number
+  end
+
+  test 'creates a Sequence by calling DB.setval(position, 1) if it still does not exist' do
+    assert !sequence_table_exists?('position')
+
+    MysqlDB.setval(:position, 100)
+    assert_equal 100, MysqlDB.currval(:position)
+  end
 end

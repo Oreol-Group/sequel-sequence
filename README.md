@@ -48,7 +48,7 @@ Sequel.migration do
 end
 ```
 
-You can also specify the initial value and increment:
+You can also specify the following optional parameters: `if_exists` – a condition of acceptability; `start` – an initial value; `increment` or `step` – step size to the next auto incrementing value:
 
 ```ruby
 create_sequence :position, increment: 2
@@ -107,7 +107,7 @@ CREATE TABLE `name_of_your_sequence_table`
 (id integer primary key autoincrement, fiction integer);
 ```
 
-You might utilize the last field as a numeric label to collect statistics on the operation of the end-to-end counter `"name_of_your_sequence_table".id` within the application. 
+You might utilize the last field `fiction` as a numeric label to collect statistics on the operation of the end-to-end counter `"name_of_your_sequence_table".id` within the application. 
 ```ruby
 create_sequence :position, if_exists: false, start: 1000, numeric_label: 1
 ```
@@ -119,6 +119,10 @@ DB.nextval_with_label(:position, 1)
 By default, `fiction` has a zero value.
 
 Otherwise, the operation of this gem for SQLite and MySQL is similar to the ways of using Sequence in more advanced RDBMS. There is only one difference here, you won't be able to change the increment value from 1 to another using the `increment` or `step` parameter.
+
+## Known issues you may encounter
+
+This solution does not allow you to simultaneously work with MySQL and MariaDB databases from one application. If such a need arises, move the data processing functionality to different microservices.
 
 ## Maintainer
 

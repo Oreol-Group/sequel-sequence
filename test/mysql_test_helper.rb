@@ -31,4 +31,9 @@ module MysqlTestHelper
 
     Class.new(migration_class, &block).new(MysqlDB)
   end
+
+  def sequence_table_exists?(name)
+    table_list = MysqlDB.fetch('SHOW TABLES;').all.map { |_key, value| value }
+    table_list.include?(name)
+  end
 end

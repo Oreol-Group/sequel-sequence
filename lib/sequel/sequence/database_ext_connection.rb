@@ -14,9 +14,13 @@ module Sequel
     define_singleton_method(:connect) do |*args|
       db = old_connect.call(*args)
       if db.adapter_scheme == :mysql2
-        @dbms = db.mariadb? ? Mariadb : Mysql
-        puts "Sequel::Database.REconnect mariadb? = #{db.mariadb?.inspect}"
-        puts "Sequel::Database.REconnect server_version = #{db.server_version.inspect}"
+        @dbms = if db.mariadb?
+                  Sequel::Sequence::Database::Server::Mariadb
+                else
+                  Sequel::Sequence::Database::Server::Mysql
+                end
+        db.log_info "Sequel::Database.connect (mariadb? = #{db.mariadb?.inspect})"
+        db.log_info "Sequel::Database.connect (server_version = #{db.server_version.inspect})"
         Sequel::Mysql2::Database.include(@dbms)
       end
       db

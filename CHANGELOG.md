@@ -11,6 +11,11 @@ Prefix your message with one of the following:
 - [Security] in case of vulnerabilities.
 -->
 
+## In progress
+
+- [Added] Important notice to README.md.
+- [Added] MySQL tests cover almost 100%.
+
 ## v0.4.0 - 2023-09-26
 
 - [Fixed] Differences between MySQL and MariaDB.
