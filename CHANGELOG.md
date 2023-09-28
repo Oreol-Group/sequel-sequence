@@ -14,8 +14,8 @@ Prefix your message with one of the following:
 ## In progress
 
 - [Added] Important notice to README.md.
-- [Added] MySQL tests cover almost 100%.
-- [Changed] Specify test suite names for SimpleCov
+- [Added] MySQL tests cover 100%.
+- [Added] SQLite tests cover 100%.
 
 ## v0.4.0 - 2023-09-26
 

@@ -18,6 +18,24 @@ Rake::TestTask.new(:mysql) do |t|
   t.test_files = FileList['test/sequel/mysql_sequence_test.rb']
 end
 
+Rake::TestTask.new(:postgresql) do |t|
+  t.libs << 'test'
+  t.libs << 'lib'
+  t.test_files = FileList['test/sequel/postgresql_sequence_test.rb']
+end
+
+Rake::TestTask.new(:mariadb) do |t|
+  t.libs << 'test'
+  t.libs << 'lib'
+  t.test_files = FileList['test/sequel/mariadb_sequence_test.rb']
+end
+
+Rake::TestTask.new(:sqlite) do |t|
+  t.libs << 'test'
+  t.libs << 'lib'
+  t.test_files = FileList['test/sequel/sqlite_sequence_test.rb']
+end
+
 RuboCop::RakeTask.new
 
 task default: %i[test rubocop]

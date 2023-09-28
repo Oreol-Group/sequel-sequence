@@ -10,9 +10,10 @@ SQLiteDB = Sequel.connect(
 
 module SqliteTestHelper
   def recreate_table
+    SQLiteDB.drop_table :apprentices, if_exists: true
     SQLiteDB.drop_sequence :position
     SQLiteDB.drop_sequence :position_id, if_exists: true
-    SQLiteDB.run 'DROP TABLE IF EXISTS objects'
+    SQLiteDB.drop_table :objects, if_exists: true
     SQLiteDB.drop_sequence 'a'
     SQLiteDB.drop_sequence 'b'
     SQLiteDB.drop_sequence 'c'
@@ -26,5 +27,11 @@ module SqliteTestHelper
     Sequel::Model.db = SQLiteDB
 
     Class.new(migration_class, &block).new(SQLiteDB)
+  end
+
+  def sequence_table_exists?(name)
+    sql = "SELECT name FROM sqlite_schema WHERE type ='table' AND name NOT LIKE 'sqlite_%';"
+    table_list = SQLiteDB.fetch(sql).all.map { |_key, value| value }
+    table_list.include?(name)
   end
 end

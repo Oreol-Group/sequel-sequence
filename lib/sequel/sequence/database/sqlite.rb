@@ -48,14 +48,10 @@ module Sequel
           if current.nil?
             create_sequence(stringify(name), { start: value })
           elsif value < current
-            # sql = [delete_from_sqlite_sequence(name)]
-            # sql << drop_sequence_table(name)
-            # sql << insert_into_sqlite_sequence(name, value)
-            # run(sql.join("\n"))
             log_info DANGER_OPT_ID
             value = current
           else
-            run(insert_into_sqlite_sequence(stringify(name), value))
+            run(update_sqlite_sequence(stringify(name), value))
           end
           value
         end
@@ -96,21 +92,12 @@ module Sequel
           "INSERT INTO #{name} (fiction) VALUES (#{num_label});"
         end
 
-        def insert_into_sqlite_sequence(name, value)
-          current = take_seq(name)
-          if current.nil?
-            "INSERT INTO sqlite_sequence (name, seq) VALUES ('#{name}', #{value});"
-          else
-            %(
-              UPDATE sqlite_sequence
-              SET seq = #{[current, value].max}
-              WHERE name = '#{name}';
-            )
-          end
-        end
-
-        def delete_from_sqlite_sequence(name)
-          "DELETE FROM sqlite_sequence WHERE name = '#{name}';"
+        def update_sqlite_sequence(name, value)
+          %(
+            UPDATE sqlite_sequence
+            SET seq = #{value}
+            WHERE name = '#{name}';
+          )
         end
 
         def drop_sequence_table(name, if_exists = nil)

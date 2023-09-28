@@ -166,9 +166,7 @@ class SqliteSequenceTest < Minitest::Test
       end
     end.down
 
-    sequence = SQLiteDB.check_sequences.find do |seq|
-      seq[:name] == 'position'
-    end
+    sequence = (list = SQLiteDB.check_sequences).empty? ? nil : list
 
     assert_nil sequence
   end
@@ -192,9 +190,7 @@ class SqliteSequenceTest < Minitest::Test
       end
     end.down
 
-    sequence = SQLiteDB.check_sequences.find do |seq|
-      seq[:name] == 'position'
-    end
+    sequence = (list = SQLiteDB.check_sequences).empty? ? nil : list
 
     assert_nil sequence
   end
@@ -295,7 +291,6 @@ class SqliteSequenceTest < Minitest::Test
   test 'creates table that references sequence' do
     with_migration do
       def up
-        drop_table :apprentices, if_exists: true
         create_sequence :position_id, if_exists: false, start: 1
         create_table :apprentices do
           primary_key :id
@@ -325,5 +320,12 @@ class SqliteSequenceTest < Minitest::Test
     assert_equal pos4, apprentice4.reload.position
 
     assert_equal pos4 - pos2, 2
+  end
+
+  test 'creates a Sequence by calling DB.setval(position, 1) if it still does not exist' do
+    assert !sequence_table_exists?('position')
+
+    SQLiteDB.setval(:position, 100)
+    assert_equal 100, SQLiteDB.currval(:position)
   end
 end

@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 module Sequel
-  class MethodNotAllowed < StandardError
-    METHOD_NOT_ALLOWED = 'Method not allowed'
+  (
+    # Error raised when attempting to utilize an invalid adapter to SEQUENCE interface.
+    MethodNotAllowed = Class.new(Error)
+  ).name
 
-    # Initialize a new Error object
-    def initialize(message = '')
-      super(message)
-    end
+  class Database
+    METHOD_NOT_ALLOWED = 'Method not allowed'
   end
 end
