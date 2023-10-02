@@ -65,12 +65,21 @@ module Sequel
 
         # for Postgres
         def currval(name)
-          name = quote(name.to_s)
+          quoted_name = quote(name.to_s)
           out = nil
-          fetch("SELECT currval(#{name})") do |row|
+          fetch("SELECT currval(#{quoted_name})") do |row|
             out = row[:currval]
           end
           out
+        rescue Sequel::DatabaseError => e
+          # We exclude dependence on the postgresql constraint.
+          if e.message =~ /\APG::ObjectNotInPrerequisiteState:(.)*is not yet defined in this session\n\z/
+            return nextval(name)
+          end
+
+          # :nocov:
+          raise e
+          # :nocov:
         end
 
         # for MariaDB
@@ -86,11 +95,12 @@ module Sequel
         end
 
         def set_column_default_nextval(table, column, sequence)
-          table = table.to_s
-          column = column.to_s
-          sequence = quote(sequence.to_s)
-          run "ALTER TABLE IF EXISTS #{table} " \
-              "ALTER COLUMN #{column} SET DEFAULT nextval(#{sequence}::regclass)"
+          sql = %(
+            ALTER TABLE IF EXISTS #{table}
+            ALTER COLUMN #{quote_name(column.to_s)}
+            SET DEFAULT nextval(#{quote(sequence.to_s)}::regclass)
+          ).strip
+          run sql
         end
       end
     end

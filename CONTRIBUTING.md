@@ -237,3 +237,12 @@ $ bundle exec rake TEST=test/sequel/mysql_sequence_test.rb
 $ bundle exec rake TEST=test/sequel/sqlite_sequence_test.rb
 $ bundle exec rake TEST=test/sequel/mock_sequence_test.rb
 ```
+
+Short command:
+```bash
+$ bundle exec rake postgresql
+$ bundle exec rake mariadb
+$ bundle exec rake mysql
+$ bundle exec rake sqlite
+$ bundle exec rake mock
+```

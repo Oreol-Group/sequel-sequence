@@ -16,7 +16,7 @@ gem install sequel-sequence
 Or add the following line to your project's Gemfile:
 
 ```ruby
-gem "sequel-sequence"
+gem 'sequel-sequence'
 ```
 
 ## Usage with PostgreSQL and MariaDB
@@ -24,6 +24,8 @@ gem "sequel-sequence"
 To create and delete a `SEQUENCE`, simply use the `create_sequence` and `drop_sequence` methods.
 
 ```ruby
+require: 'sequel-sequence'
+
 Sequel.migration do
   up do
     create_sequence :position, if_exists: false
@@ -37,6 +39,8 @@ end
 
 It would also be correct to write:
 ```ruby
+require: 'sequel-sequence'
+
 Sequel.migration do
   up do
     create_sequence :position
@@ -95,7 +99,7 @@ DB.currval("position")
 DB.lastval("position")
 # Both options are acceptable in PostgreSQL and MySQL.
 
-# Set sequence's current value. It must be greater than lastval or currval.
+# Set sequence's current value. It must be greater than lastval or currval. Only PostgreSQL allows us to set a lower value.
 DB.setval("position", 1234)
 ```
 
@@ -123,6 +127,12 @@ Otherwise, the operation of this gem for SQLite and MySQL is similar to the ways
 ## Known issues you may encounter
 
 This solution does not allow you to simultaneously work with MySQL and MariaDB databases from one application. If such a need arises, move the data processing functionality to different microservices.
+
+## Additional handy functions
+
+To discover a database information about `SEQUENCE`s you could take advantage of `check_sequences` and `custom_sequence?` methods.
+- `custom_sequence?(:sequence_name)` allows you to instantly find out the availability of the called `SEQUENCE`. 
+- `check_sequences` provides complete information about known `SEQUENCE`s in the datebase. The output data depends on RDBMS.
 
 ## Maintainer
 

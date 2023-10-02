@@ -72,38 +72,75 @@ class MariadbSequenceTest < Minitest::Test
     assert_equal 3, MariaDB.nextval(:position)
   end
 
-  test "returns current/last sequence value, which doesn't increase by itself" do
+  test %( returns current/last sequence value, which doesn't increase by itself
+          for migration WITHOUT 'start' or 'increment' values ) do
     with_migration do
       def up
         create_sequence :position
       end
     end.up
 
+    assert_equal 1, MariaDB.currval(:position)
+    assert_equal 1, MariaDB.lastval(:position)
+
     MariaDB.nextval(:position)
 
-    assert_equal 1, MariaDB.currval(:position)
-    assert_equal 1, MariaDB.lastval(:position)
-    assert_equal 1, MariaDB.currval(:position)
-    assert_equal 1, MariaDB.lastval(:position)
+    assert_equal 2, MariaDB.currval(:position)
+    assert_equal 2, MariaDB.lastval(:position)
   end
 
-  test 'sets sequence value' do
+  test %( returns current/last sequence value, which doesn't increase by itself
+          for migration WITH 'start' and 'increment' values ) do
+    with_migration do
+      def up
+        create_sequence :position, start: 2, increment: 3
+      end
+    end.up
+
+    assert_equal 2, MariaDB.currval(:position)
+    assert_equal 2, MariaDB.lastval(:position)
+
+    MariaDB.nextval(:position)
+
+    assert_equal 5, MariaDB.currval(:position)
+    assert_equal 5, MariaDB.lastval(:position)
+  end
+
+  test 'sets a new sequence value greater than the current one' do
     with_migration do
       def up
         create_sequence :position
       end
     end.up
 
-    MariaDB.nextval(:position)
     assert_equal MariaDB.currval(:position), 1
 
     MariaDB.setval(:position, 101)
-    # in MariaDB, 'lastval' only works after 'nextval' rather than  'setval'
-    assert_equal 1, MariaDB.lastval(:position)
+    # assert_equal 1, MariaDB.lastval(:position)
+    # we observe the modified behavior of the method
+    assert_equal 101, MariaDB.lastval(:position)
 
     MariaDB.nextval(:position)
-    # now the value is correct
+    # the value is correct in any case
     assert_equal 102, MariaDB.lastval(:position)
+  end
+
+  test 'sets a new sequence value less than the current one (does not change the value)' do
+    with_migration do
+      def up
+        create_sequence :position, start: 100
+      end
+    end.up
+
+    assert_equal MariaDB.currval(:position), 100
+
+    MariaDB.nextval(:position)
+    assert_equal MariaDB.currval(:position), 101
+
+    MariaDB.setval(:position, 1)
+    assert_equal 101, MariaDB.lastval(:position)
+
+    assert_equal 102, MariaDB.nextval(:position)
   end
 
   test 'drops sequence and check_sequences' do
@@ -151,6 +188,18 @@ class MariadbSequenceTest < Minitest::Test
     assert list.include?('a')
     assert list.include?('b')
     assert list.include?('c')
+  end
+
+  test 'checks custom sequence generated from code' do
+    assert_equal MariaDB.custom_sequence?(:c), false
+
+    with_migration do
+      def up
+        create_sequence :c
+      end
+    end.up
+
+    assert_equal MariaDB.custom_sequence?(:c), true
   end
 
   test 'creates table that references sequence' do

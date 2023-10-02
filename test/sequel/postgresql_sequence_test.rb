@@ -72,33 +72,80 @@ class PostgresqlSequenceTest < Minitest::Test
     assert_equal 3, PostgresqlDB.nextval(:position)
   end
 
-  test "returns current/last sequence value, which doesn't increase by itself" do
-    with_migration do
-      def up
-        create_sequence :position, start: 2, increment: 2
-      end
-    end.up
-
-    PostgresqlDB.nextval(:position)
-
-    assert_equal 2, PostgresqlDB.currval(:position)
-    assert_equal 2, PostgresqlDB.lastval(:position)
-    assert_equal 2, PostgresqlDB.currval(:position)
-    assert_equal 2, PostgresqlDB.lastval(:position)
-  end
-
-  test 'sets sequence value' do
+  test %( returns current/last sequence value, which doesn't increase by itself
+          for migration WITHOUT 'start' or 'increment' values ) do
     with_migration do
       def up
         create_sequence :position
       end
     end.up
 
+    # catch the 'start' value
+    assert_equal 1, PostgresqlDB.currval(:position)
+    # is the same value
+    assert_equal 1, PostgresqlDB.lastval(:position)
+
     PostgresqlDB.nextval(:position)
+
+    assert_equal 2, PostgresqlDB.currval(:position)
+    assert_equal 2, PostgresqlDB.lastval(:position)
+  end
+
+  test %( returns current/last sequence value, which doesn't increase by itself
+          for migration WITH 'start' and 'increment' values ) do
+    with_migration do
+      def up
+        create_sequence :position, start: 2, increment: 3
+      end
+    end.up
+
+    # catch the 'start' value
+    assert_equal 2, PostgresqlDB.currval(:position)
+    # is the same value
+    assert_equal 2, PostgresqlDB.lastval(:position)
+
+    PostgresqlDB.nextval(:position)
+
+    # support 'increment' value
+    assert_equal 5, PostgresqlDB.currval(:position)
+    assert_equal 5, PostgresqlDB.lastval(:position)
+  end
+
+  test 'sets a new sequence value greater than the current one' do
+    with_migration do
+      def up
+        create_sequence :position
+      end
+    end.up
+
     assert_equal PostgresqlDB.currval(:position), 1
 
+    PostgresqlDB.nextval(:position)
+    assert_equal PostgresqlDB.currval(:position), 2
+
     PostgresqlDB.setval(:position, 101)
-    assert_equal 101, PostgresqlDB.currval(:position)
+    assert_equal 101, PostgresqlDB.lastval(:position)
+
+    assert_equal 102, PostgresqlDB.nextval(:position)
+  end
+
+  test 'sets a new sequence value less than the current one (change the value as an EXCEPTION)' do
+    with_migration do
+      def up
+        create_sequence :position, start: 100
+      end
+    end.up
+
+    assert_equal PostgresqlDB.currval(:position), 100
+
+    PostgresqlDB.nextval(:position)
+    assert_equal PostgresqlDB.currval(:position), 101
+
+    PostgresqlDB.setval(:position, 1)
+    assert_equal 1, PostgresqlDB.lastval(:position)
+
+    PostgresqlDB.nextval(:position)
+    assert_equal 2, PostgresqlDB.lastval(:position)
   end
 
   test 'drops sequence and check_sequences' do

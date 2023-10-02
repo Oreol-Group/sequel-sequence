@@ -91,20 +91,41 @@ class MysqlSequenceTest < Minitest::Test
     assert_operator (2 + @step), :>, MysqlDB.nextval(:position)
   end
 
-  test "returns current/last sequence value, which doesn't increase by itself" do
+  test %( returns current/last sequence value, which doesn't increase by itself
+          for migration WITHOUT 'start' or 'increment' values ) do
     with_migration do
       def up
         create_sequence :position
       end
     end.up
 
+    # catch the 'start' value 'by default
+    assert_equal 1, MysqlDB.currval(:position)
+    assert_equal 1, MysqlDB.lastval(:position)
+
     MysqlDB.nextval(:position)
-    # changed value (=2) after default one (=1)
 
     assert_equal 2, MysqlDB.currval(:position)
     assert_equal 2, MysqlDB.lastval(:position)
+  end
+
+  test %( returns current/last sequence value, which doesn't increase by itself
+          for migration WITH 'start' and 'increment' values ) do
+    with_migration do
+      def up
+        create_sequence :position, start: 2, increment: 3
+      end
+    end.up
+
+    # catch the 'start' value
     assert_equal 2, MysqlDB.currval(:position)
     assert_equal 2, MysqlDB.lastval(:position)
+
+    MysqlDB.nextval(:position)
+
+    # Doesn't support 'increment' value
+    assert_equal 3, MysqlDB.currval(:position)
+    assert_equal 3, MysqlDB.lastval(:position)
   end
 
   test 'sets a new sequence value greater than the current one' do
@@ -125,7 +146,7 @@ class MysqlSequenceTest < Minitest::Test
     assert_equal 102, MysqlDB.nextval(:position)
   end
 
-  test 'sets a new sequence value less than the current one' do
+  test 'sets a new sequence value less than the current one (does not change the value)' do
     with_migration do
       def up
         create_sequence :position, start: 100

@@ -76,20 +76,42 @@ class SqliteSequenceTest < Minitest::Test
     assert_operator (2 + @step), :>, SQLiteDB.nextval(:position)
   end
 
-  test "returns current/last sequence value, which doesn't increase by itself" do
+  test %( returns current/last sequence value, which doesn't increase by itself
+          for migration WITHOUT 'start' or 'increment' values ) do
     with_migration do
       def up
         create_sequence :position
       end
     end.up
 
+    # catch the 'start' value 'by default
+    assert_equal 1, SQLiteDB.currval(:position)
+    assert_equal 1, SQLiteDB.lastval(:position)
+
     SQLiteDB.nextval(:position)
     # changed value (=2) after default one (=1)
 
     assert_equal 2, SQLiteDB.currval(:position)
     assert_equal 2, SQLiteDB.lastval(:position)
+  end
+
+  test %( returns current/last sequence value, which doesn't increase by itself
+          for migration WITH 'start' and 'increment' values ) do
+    with_migration do
+      def up
+        create_sequence :position, start: 2, increment: 3
+      end
+    end.up
+
+    # catch the 'start' value
     assert_equal 2, SQLiteDB.currval(:position)
     assert_equal 2, SQLiteDB.lastval(:position)
+
+    SQLiteDB.nextval(:position)
+
+    # Doesn't support 'increment' value
+    assert_equal 3, SQLiteDB.currval(:position)
+    assert_equal 3, SQLiteDB.lastval(:position)
   end
 
   test 'sets a new sequence value greater than the current one' do
@@ -111,7 +133,7 @@ class SqliteSequenceTest < Minitest::Test
     assert_equal 102, SQLiteDB.lastval(:position)
   end
 
-  test 'sets a new sequence value less than the current one' do
+  test 'sets a new sequence value less than the current one (does not change the value)' do
     with_migration do
       def up
         create_sequence :position, start: 100
@@ -286,6 +308,18 @@ class SqliteSequenceTest < Minitest::Test
 
     fiction_set_size = SQLiteDB.fetch('SELECT * FROM position_id where fiction = 0;').all.size
     assert_equal 2, fiction_set_size
+  end
+
+  test 'checks custom sequence generated from code' do
+    assert_equal SQLiteDB.custom_sequence?(:c), false
+
+    with_migration do
+      def up
+        create_sequence :c
+      end
+    end.up
+
+    assert_equal SQLiteDB.custom_sequence?(:c), true
   end
 
   test 'creates table that references sequence' do

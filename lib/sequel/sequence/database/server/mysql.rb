@@ -60,7 +60,7 @@ module Sequel
           alias currval lastval
 
           def setval(name, value)
-            current = lastval(stringify(name))
+            current = lastval(name)
             if current.nil?
               create_sequence(stringify(name), { start: value })
             elsif value < current

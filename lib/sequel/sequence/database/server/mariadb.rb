@@ -13,6 +13,14 @@ module Sequel
             "`#{name.gsub(/[`"']/, '')}`"
           end
 
+          def custom_sequence?(sequence_name)
+            db = name_of_current_database
+            return false if db.empty?
+
+            sql = "SHOW FULL TABLES WHERE Table_type = 'SEQUENCE' and Tables_in_#{db} = '#{sequence_name}';"
+            fetch(sql).all.size.positive?
+          end
+
           def check_sequences
             fetch("SHOW FULL TABLES WHERE Table_type = 'SEQUENCE';").all.to_a
           end
@@ -46,31 +54,48 @@ module Sequel
           end
 
           def lastval(name)
-            name = quote(name.to_s)
+            quoted_name = quote(name.to_s)
             out = nil
-            fetch("SELECT lastval(#{name});") do |row|
-              out = row["lastval(#{name})".to_sym]
+            fetch("SELECT lastval(#{quoted_name});") do |row|
+              out = row["lastval(#{quoted_name})".to_sym]
             end
+            return nextval(name) if out.nil?
+
             out
           end
 
           alias currval lastval
 
           def setval(name, value)
-            name = quote(name.to_s)
-            out = nil
-            fetch("SELECT setval(#{name}, #{value});") do |row|
-              out = row["setval(#{name}, #{value})".to_sym]
+            current = lastval(name)
+            if value <= current
+              log_info Sequel::Database::DANGER_OPT_ID if value < current
+              value = current
+            else
+              quoted_name = quote(name.to_s)
+              value -= 1
+              out = nil
+              fetch("SELECT setval(#{quoted_name}, #{value});") do |row|
+                out = row["setval(#{quoted_name}, #{value})".to_sym]
+              end
+              value = nextval(name)
             end
-            out
+            value
           end
 
           def set_column_default_nextval(table, column, sequence)
-            table = table.to_s
-            column = column.to_s
-            sequence = quote(sequence.to_s)
-            run "ALTER TABLE IF EXISTS #{table} " \
-                "ALTER COLUMN #{column} SET DEFAULT nextval(#{sequence});"
+            sql = %(
+              ALTER TABLE IF EXISTS #{quote(table.to_s)}
+              ALTER COLUMN #{quote_name(column.to_s)}
+              SET DEFAULT nextval(#{quote(sequence.to_s)})
+            ).strip
+            run sql
+          end
+
+          private
+
+          def name_of_current_database
+            fetch('SELECT DATABASE() AS db;').first[:db]
           end
         end
       end

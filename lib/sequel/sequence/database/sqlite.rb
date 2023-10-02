@@ -6,6 +6,11 @@ module Sequel
   module Sequence
     module Database
       module SQLite
+        def custom_sequence?(sequence_name)
+          sql = "SELECT * FROM `sqlite_sequence` WHERE name = '#{stringify(sequence_name)}';"
+          fetch(sql).all.size.positive?
+        end
+
         def check_sequences
           fetch('SELECT * FROM `sqlite_sequence`;').all.to_a
         end
@@ -44,11 +49,11 @@ module Sequel
         alias currval lastval
 
         def setval(name, value)
-          current = lastval(stringify(name))
+          current = lastval(name)
           if current.nil?
             create_sequence(stringify(name), { start: value })
           elsif value < current
-            log_info DANGER_OPT_ID
+            log_info Sequel::Database::DANGER_OPT_ID
             value = current
           else
             run(update_sqlite_sequence(stringify(name), value))
@@ -79,7 +84,7 @@ module Sequel
 
         def create_sequence_table(name, if_exists = nil)
           %(
-            CREATE TABLE #{if_exists || IF_NOT_EXISTS} #{name}
+            CREATE TABLE #{if_exists || Sequel::Database::IF_NOT_EXISTS} #{name}
             (id integer primary key autoincrement, fiction integer);
           )
         end
@@ -101,7 +106,7 @@ module Sequel
         end
 
         def drop_sequence_table(name, if_exists = nil)
-          "DROP TABLE #{if_exists || IF_EXISTS} #{name};"
+          "DROP TABLE #{if_exists || Sequel::Database::IF_EXISTS} #{name};"
         end
 
         def select_max_seq(name)
