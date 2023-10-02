@@ -33,13 +33,14 @@ your contribution is according to how this project works.
 
 1. [Fork](https://help.github.com/forking/) sequel-sequence
 2. Create a topic branch - `git checkout -b my_branch`
-3. Make your changes using [descriptive commit messages](#commit-messages)
-4. Update CHANGELOG.md describing your changes by adding an entry to the
+3. Unlock gem dependencies in `sequel-sequence.gemspec`
+4. Make your changes using [descriptive commit messages](#commit-messages)
+5. Update CHANGELOG.md describing your changes by adding an entry to the
    "Unreleased" section. If this section is not available, create one right
    before the last version.
-5. Push to your branch - `git push origin my_branch`
-6. [Create a pull request](https://docs.github.com/articles/creating-a-pull-request)
-7. That's it!
+6. Push to your branch - `git push origin my_branch`
+7. [Create a pull request](https://docs.github.com/articles/creating-a-pull-request)
+8. That's it!
 
 ## Styleguides
 

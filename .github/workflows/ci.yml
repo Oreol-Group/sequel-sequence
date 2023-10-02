@@ -16,7 +16,6 @@ jobs:
         os: ['ubuntu-latest']
         sequel: ['~>5.28']
         ruby: ['3.2', '3.1', '3.0', '2.7']
-        gemfile: ['Gemfile']
     runs-on: ${{ matrix.os }}
     name: Tests with Ruby ${{ matrix.ruby }}
 
@@ -58,7 +57,7 @@ jobs:
 
     env:
       SEQUEL: ${{ matrix.sequel }}
-      BUNDLE_GEMFILE: ${{ matrix.gemfile }}
+      BUNDLE_GEMFILE: .ci.gemfile
     steps:
       - uses: actions/checkout@v4
 

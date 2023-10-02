@@ -99,7 +99,7 @@ DB.currval("position")
 DB.lastval("position")
 # Both options are acceptable in PostgreSQL and MySQL.
 
-# Set sequence's current value. It must be greater than lastval or currval. Only PostgreSQL allows us to set a lower value.
+# Set a new sequence value. It must be greater than lastval or currval. Only PostgreSQL allows setting a lower value.
 DB.setval("position", 1234)
 ```
 
