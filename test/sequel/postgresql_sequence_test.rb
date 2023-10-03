@@ -175,6 +175,12 @@ class PostgresqlSequenceTest < Minitest::Test
   end
 
   test 'orders sequences' do
+    with_migration do
+      def up
+        drop_table :things, if_exists: true
+      end
+    end.up
+
     list = PostgresqlDB.check_sequences.map { |s| s[:sequence_name] }
     assert !list.include?('a')
     assert !list.include?('b')
@@ -182,7 +188,6 @@ class PostgresqlSequenceTest < Minitest::Test
 
     with_migration do
       def up
-        drop_table :things, if_exists: true
         create_sequence :c
         create_sequence :a
         create_sequence :b

@@ -89,7 +89,6 @@ class SqliteSequenceTest < Minitest::Test
     assert_equal 1, SQLiteDB.lastval(:position)
 
     SQLiteDB.nextval(:position)
-    # changed value (=2) after default one (=1)
 
     assert_equal 2, SQLiteDB.currval(:position)
     assert_equal 2, SQLiteDB.lastval(:position)
@@ -218,6 +217,12 @@ class SqliteSequenceTest < Minitest::Test
   end
 
   test 'orders sequences' do
+    with_migration do
+      def up
+        drop_table :objects, if_exists: true
+      end
+    end.up
+
     list = SQLiteDB.check_sequences.map { |s| s[:name] }
     assert !list.include?('a')
     assert !list.include?('b')
@@ -225,7 +230,6 @@ class SqliteSequenceTest < Minitest::Test
 
     with_migration do
       def up
-        drop_table :things, if_exists: true
         create_sequence :c, { start: 1 }
         create_sequence :a, { start: 3 }
         create_sequence :b
@@ -310,18 +314,6 @@ class SqliteSequenceTest < Minitest::Test
     assert_equal 2, fiction_set_size
   end
 
-  test 'checks custom sequence generated from code' do
-    assert_equal SQLiteDB.custom_sequence?(:c), false
-
-    with_migration do
-      def up
-        create_sequence :c
-      end
-    end.up
-
-    assert_equal SQLiteDB.custom_sequence?(:c), true
-  end
-
   test 'creates table that references sequence' do
     with_migration do
       def up
@@ -354,6 +346,18 @@ class SqliteSequenceTest < Minitest::Test
     assert_equal pos4, apprentice4.reload.position
 
     assert_equal pos4 - pos2, 2
+  end
+
+  test 'checks custom sequence generated from code' do
+    assert_equal SQLiteDB.custom_sequence?(:c), false
+
+    with_migration do
+      def up
+        create_sequence :c
+      end
+    end.up
+
+    assert_equal SQLiteDB.custom_sequence?(:c), true
   end
 
   test 'creates a Sequence by calling DB.setval(position, 1) if it still does not exist' do

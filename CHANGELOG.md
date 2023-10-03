@@ -11,7 +11,7 @@ Prefix your message with one of the following:
 - [Security] in case of vulnerabilities.
 -->
 
-## v0.4.2 - 2023-10-02
+## v0.4.2 - 2023-10-03
 
 - [Added] Additions into README.md.
 - [Added] Exclusion of dependence on the Postgresql constraint for "PG::The object is not in the required state P: ERROR:  currval of sequence "name_of_sequence" is not yet defined in this session".
@@ -20,6 +20,7 @@ Prefix your message with one of the following:
 - [Fixed] `currval` for initial state of sequence in Postgresql
 - [Fixed] `lastval` for initial state of sequence in MariaDB
 - [Changed] The default action `setval` for MariaDB to invoke `setval` if necessary
+- [Changed] The class initialization algorithm in `sequence.rb` depending on the gems included in the user project.
 
 ## v0.4.1 - 2023-09-28
 

@@ -126,7 +126,8 @@ Otherwise, the operation of this gem for SQLite and MySQL is similar to the ways
 
 ## Known issues you may encounter
 
-This solution does not allow you to simultaneously work with MySQL and MariaDB databases from one application. If such a need arises, move the data processing functionality to different microservices.
+- This solution does not allow you to simultaneously work with MySQL and MariaDB databases from one application. If such a need arises, move the data processing functionality to different microservices.
+- When you start with a new database in SQLite, you'll receive an error message - "`SQLite3::SQLException: no such table: sqlite_sequence`".  `sqlite_sequence` table is not created, until you define at least one autoincrement and primary key column in your schema.
 
 ## Additional handy functions
 

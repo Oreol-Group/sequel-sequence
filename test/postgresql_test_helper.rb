@@ -13,8 +13,10 @@ PostgresqlDB = Sequel.connect(
 
 module PostgresqlTestHelper
   def recreate_table
-    PostgresqlDB.run 'DROP TABLE IF EXISTS things'
+    PostgresqlDB.run 'DROP TABLE IF EXISTS masters'
     PostgresqlDB.run 'DROP SEQUENCE IF EXISTS position'
+    PostgresqlDB.run 'DROP SEQUENCE IF EXISTS position_id'
+    PostgresqlDB.run 'DROP TABLE IF EXISTS things'
     PostgresqlDB.run 'DROP SEQUENCE IF EXISTS a'
     PostgresqlDB.run 'DROP SEQUENCE IF EXISTS b'
     PostgresqlDB.run 'DROP SEQUENCE IF EXISTS c'

@@ -13,7 +13,9 @@ MariaDB = Sequel.connect(
 
 module MariadbTestHelper
   def recreate_table
+    MariaDB.run 'DROP TABLE IF EXISTS builders'
     MariaDB.run 'DROP SEQUENCE IF EXISTS position'
+    MariaDB.run 'DROP SEQUENCE IF EXISTS position_id'
     MariaDB.run 'DROP TABLE IF EXISTS wares'
     MariaDB.run 'DROP SEQUENCE IF EXISTS a'
     MariaDB.run 'DROP SEQUENCE IF EXISTS b'

@@ -162,14 +162,18 @@ class MariadbSequenceTest < Minitest::Test
       end
     end.down
 
-    sequence = MariaDB.check_sequences.find do |seq|
-      seq[:Tables_in_test] == 'position'
-    end
+    sequence = MariaDB.check_sequences
 
-    assert_nil sequence
+    assert_equal 0, sequence.size
   end
 
   test 'orders sequences' do
+    with_migration do
+      def up
+        drop_table :wares, if_exists: true
+      end
+    end.up
+
     list = MariaDB.check_sequences.map { |s| s[:Tables_in_test] }
     assert !list.include?('a')
     assert !list.include?('b')
@@ -177,7 +181,6 @@ class MariadbSequenceTest < Minitest::Test
 
     with_migration do
       def up
-        drop_table :things, if_exists: true
         create_sequence :c
         create_sequence :a
         create_sequence :b
@@ -205,7 +208,6 @@ class MariadbSequenceTest < Minitest::Test
   test 'creates table that references sequence' do
     with_migration do
       def up
-        drop_table :builders, if_exists: true
         create_sequence :position_id, if_exists: false, start: 1
         create_table :builders do
           primary_key :id

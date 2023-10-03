@@ -236,6 +236,12 @@ class MysqlSequenceTest < Minitest::Test
   end
 
   test 'orders sequences' do
+    with_migration do
+      def up
+        drop_table :stuffs, if_exists: true
+      end
+    end.up
+
     list = MysqlDB.check_sequences.map { |s| s[:name] }
     assert !list.include?('a')
     assert !list.include?('b')
@@ -243,7 +249,6 @@ class MysqlSequenceTest < Minitest::Test
 
     with_migration do
       def up
-        drop_table :things, if_exists: true
         create_sequence :c, { start: 1 }
         create_sequence :a, { start: 3 }
         create_sequence :b
@@ -254,18 +259,6 @@ class MysqlSequenceTest < Minitest::Test
     assert list.include?('a')
     assert list.include?('b')
     assert list.include?('c')
-  end
-
-  test 'checks custom sequence generated from code' do
-    assert_equal MysqlDB.custom_sequence?(:c), false
-
-    with_migration do
-      def up
-        create_sequence :c
-      end
-    end.up
-
-    assert_equal MysqlDB.custom_sequence?(:c), true
   end
 
   test 'recreates the same sequence with the same start value' do
@@ -372,6 +365,18 @@ class MysqlSequenceTest < Minitest::Test
     assert_equal pos4, creator4.reload.position
 
     assert_equal pos4 - pos2, 2
+  end
+
+  test 'checks custom sequence generated from code' do
+    assert_equal MysqlDB.custom_sequence?(:c), false
+
+    with_migration do
+      def up
+        create_sequence :c
+      end
+    end.up
+
+    assert_equal MysqlDB.custom_sequence?(:c), true
   end
 
   test "catches a Mysql2::Error: «Table mysql_sequence doesn't exist»" do
