@@ -24,7 +24,7 @@ gem 'sequel-sequence'
 To create and delete a `SEQUENCE`, simply use the `create_sequence` and `drop_sequence` methods.
 
 ```ruby
-require: 'sequel-sequence'
+require 'sequel-sequence'
 
 Sequel.migration do
   up do
@@ -39,7 +39,7 @@ end
 
 It would also be correct to write:
 ```ruby
-require: 'sequel-sequence'
+require 'sequel-sequence'
 
 Sequel.migration do
   up do
