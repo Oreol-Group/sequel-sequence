@@ -230,4 +230,100 @@ class MariadbSequenceTest < Minitest::Test
 
     assert_equal pos2 - pos1, 1
   end
+
+  test 'checks exception for delete_to_currval method' do
+    with_migration do
+      def up
+        create_sequence :position_id, if_exists: false, start: 1
+      end
+    end.up
+
+    assert_equal 1, MariaDB.currval(:position_id)
+
+    assert_raises Sequel::MethodNotAllowed do
+      MariaDB.delete_to_currval(:position_id)
+    end
+  end
+
+  test 'deletes sequences by "drop_sequence?"' do
+    with_migration do
+      def up
+        create_sequence :a
+        create_sequence :b
+        create_sequence :c
+      end
+    end.up
+
+    assert MariaDB.custom_sequence?(:a)
+    assert MariaDB.custom_sequence?(:b)
+    assert MariaDB.custom_sequence?(:c)
+
+    MariaDB.drop_sequence?(:a, :b, :c, :d)
+
+    assert !MariaDB.custom_sequence?(:a)
+    assert !MariaDB.custom_sequence?(:b)
+    assert !MariaDB.custom_sequence?(:c)
+  end
+
+  test 'deletes if exists before creating! the sequence' do
+    with_migration do
+      def up
+        create_sequence! :position, { start: 1000, increment: 10 }
+      end
+    end.up
+
+    assert_equal 1000, MariaDB.currval(:position)
+
+    10.times { MariaDB.nextval(:position) }
+    assert_equal 1100, MariaDB.currval(:position)
+
+    MariaDB.create_sequence!(:position, { start: 1, increment: 1 })
+
+    assert_equal 1, MariaDB.currval(:position)
+
+    10.times { MariaDB.nextval(:position) }
+    assert_equal 11, MariaDB.currval(:position)
+  end
+
+  test 'checks the BIGINT primery key for a sequence table' do
+    with_migration do
+      def up
+        create_sequence :position, { start: 9_223_372_036_854_775_800 }
+      end
+    end.up
+
+    assert_equal 9_223_372_036_854_775_800, MariaDB.currval(:position)
+    assert_equal 9_223_372_036_854_775_801, MariaDB.nextval(:position)
+  end
+
+  test 'checks the BIGINT primery key with negative value for a sequence table' do
+    with_migration do
+      def up
+        create_sequence :position, { minvalue: -9_223_372_036_854_775_807 }
+      end
+    end.up
+
+    assert_equal(-9_223_372_036_854_775_807, MariaDB.currval(:position))
+    assert_equal(-9_223_372_036_854_775_806, MariaDB.nextval(:position))
+  end
+
+  # https://mariadb.com/kb/en/create-sequence/#arguments-to-create
+  test 'adds sequence with ext. params' do
+    with_migration do
+      def up
+        create_sequence :position, {
+          minvalue: -250,
+          maxvalue: 250,
+          start: -1,
+          cache: 3,
+          cycle: 'CYCLE',
+          increment: 2,
+          if_exists: false
+        }
+      end
+    end.up
+
+    assert_equal(-1, MariaDB.nextval('position'))
+    assert_equal 1, MariaDB.nextval('position')
+  end
 end

@@ -75,12 +75,16 @@ module Sequel
           end
 
           def set_column_default_nextval(table, column, sequence)
-            run create_sequenced_column(stringify(table),
-                                        stringify(column),
-                                        stringify(sequence))
-            run update_sequenced_column(stringify(table),
-                                        stringify(column),
-                                        stringify(sequence))
+            run trigger_create_sequenced_column(stringify(table),
+                                                stringify(column),
+                                                stringify(sequence))
+            run trigger_update_sequenced_column(stringify(table),
+                                                stringify(column),
+                                                stringify(sequence))
+          end
+
+          def delete_to_currval(name)
+            run delete_to_current_seq(stringify(name))
           end
 
           private
@@ -97,8 +101,8 @@ module Sequel
           def create_sequence_table(name, if_exists = nil)
             %(
               CREATE TABLE #{if_exists || Sequel::Database::IF_NOT_EXISTS} #{name}
-              (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-               fiction INT);
+              (id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+               fiction BIGINT);
             ).strip
           end
 
@@ -109,7 +113,7 @@ module Sequel
           def create_mysql_sequence
             %(
               CREATE TABLE #{Sequel::Database::IF_NOT_EXISTS} mysql_sequence
-              (name VARCHAR(40), seq INT);
+              (name VARCHAR(40), seq BIGINT);
             ).strip
           end
 
@@ -147,7 +151,7 @@ module Sequel
             "INSERT INTO mysql_sequence (name, seq) VALUES ('#{name}', LAST_INSERT_ID());"
           end
 
-          def create_sequenced_column(table, _column, sequence)
+          def trigger_create_sequenced_column(table, _column, sequence)
             %(
               CREATE TRIGGER IF NOT EXISTS #{table}_#{sequence} BEFORE INSERT
               ON #{table}
@@ -160,7 +164,7 @@ module Sequel
             ).strip
           end
 
-          def update_sequenced_column(table, column, sequence)
+          def trigger_update_sequenced_column(table, column, sequence)
             %(
               CREATE TRIGGER IF NOT EXISTS #{table}_#{column} BEFORE INSERT
               ON #{table}
@@ -177,6 +181,10 @@ module Sequel
             # :nocov:
             raise e
             # :nocov:
+          end
+
+          def delete_to_current_seq(name)
+            "DELETE QUICK IGNORE FROM #{name} WHERE id < (SELECT * FROM (SELECT MAX(id) FROM #{name} ) AS a);"
           end
         end
       end

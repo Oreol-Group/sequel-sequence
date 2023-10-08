@@ -7,8 +7,6 @@ module Sequel
   module Sequence
     module Database
       module PostgreSQL
-        SEQUENCE_COMMENT = 'created by sequel-sequence'
-
         def quote_column_name(name)
           PG::Connection.quote_ident(name).freeze
         end
@@ -27,7 +25,7 @@ module Sequel
             return false
           end
 
-          out == SEQUENCE_COMMENT
+          out == Sequel::Database::SEQUENCE_COMMENT
         end
 
         def check_sequences
@@ -35,23 +33,37 @@ module Sequel
         end
 
         def create_sequence(name, options = {})
+          data_type = options[:data_type]
+          minvalue = options[:minvalue]
+          maxvalue = options[:maxvalue]
+          start = options[:start]
+          cache = options[:cache]
+          cycle = options[:cycle]
+          owned_by = options[:owned_by]
+
           increment = options[:increment] || options[:step]
           if_exists = build_exists_condition(options[:if_exists])
           name = quote_name(name.to_s)
 
           sql = ["CREATE SEQUENCE #{if_exists} #{name}"]
+          sql << "AS #{data_type}" if data_type
           sql << "INCREMENT BY #{increment}" if increment
-          sql << "START WITH #{options[:start]}" if options[:start]
+          sql << "MINVALUE  #{minvalue}" if minvalue
+          sql << "MAXVALUE  #{maxvalue}" if maxvalue
+          sql << "START WITH #{start}" if start
+          sql << "CACHE  #{cache}" if cache
+          sql << cycle.to_s if cycle
+          sql << "OWNED BY  #{owned_by}" if owned_by
           sql << ';'
-          sql << "COMMENT ON SEQUENCE #{name} IS '#{SEQUENCE_COMMENT}';"
+          sql << "COMMENT ON SEQUENCE #{name} IS '#{Sequel::Database::SEQUENCE_COMMENT}';"
 
           run(sql.join("\n"))
         end
 
-        def drop_sequence(name)
+        def drop_sequence(name, options = {})
+          if_exists = build_exists_condition(options[:if_exists])
           name = quote_name(name.to_s)
-          sql = "DROP SEQUENCE IF EXISTS #{name}"
-          run(sql)
+          run drop_sequence_table(name, if_exists)
         end
 
         def nextval(name)
@@ -101,6 +113,12 @@ module Sequel
             SET DEFAULT nextval(#{quote(sequence.to_s)}::regclass)
           ).strip
           run sql
+        end
+
+        private
+
+        def drop_sequence_table(name, if_exists = nil)
+          "DROP SEQUENCE #{if_exists || Sequel::Database::IF_EXISTS} #{name};"
         end
       end
     end

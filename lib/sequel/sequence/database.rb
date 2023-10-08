@@ -7,6 +7,7 @@ module Sequel
       DANGER_OPT_INCREMENT = 'Warning! Increments greater than 1 are not supported.'
       IF_EXISTS = 'IF EXISTS'
       IF_NOT_EXISTS = 'IF NOT EXISTS'
+      SEQUENCE_COMMENT = 'created by sequel-sequence'
 
       def check_options(params)
         log_info DANGER_OPT_INCREMENT if params[:increment] && params[:increment] != 1
@@ -72,6 +73,22 @@ module Sequel
         when false
           IF_NOT_EXISTS
         end
+      end
+
+      def delete_to_currval(_name)
+        raise Sequel::MethodNotAllowed, Sequel::Database::METHOD_NOT_ALLOWED
+      end
+
+      def drop_sequence?(*names)
+        names.each do |n|
+          drop_sequence(n, if_exists: true)
+        end
+        false
+      end
+
+      def create_sequence!(name, options = nil)
+        drop_sequence(name, if_exists: true)
+        create_sequence(name, options)
       end
     end
   end

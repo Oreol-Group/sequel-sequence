@@ -394,4 +394,95 @@ class MysqlSequenceTest < Minitest::Test
     MysqlDB.setval(:position, 100)
     assert_equal 100, MysqlDB.currval(:position)
   end
+
+  test 'deletes history from the sequence_table' do
+    with_migration do
+      def up
+        create_sequence :position_id, if_exists: false, start: 1
+      end
+    end.up
+
+    assert_equal 1, MysqlDB.currval(:position_id)
+
+    sequence_table_size = MysqlDB.fetch('SELECT count(*) as len FROM position_id;').first[:len]
+    assert_equal 1, sequence_table_size
+
+    10.times { MysqlDB.nextval(:position_id) }
+
+    assert_equal 11, MysqlDB.currval(:position_id)
+
+    sequence_table_size = MysqlDB.fetch('SELECT count(*) as len FROM position_id;').first[:len]
+    assert_equal 11, sequence_table_size
+
+    MysqlDB.delete_to_currval(:position_id)
+
+    assert_equal 11, MysqlDB.currval(:position_id)
+
+    sequence_table_size = MysqlDB.fetch('SELECT count(*) as len FROM position_id;').first[:len]
+    assert_equal 1, sequence_table_size
+  end
+
+  test 'deletes sequences by "drop_sequence?"' do
+    with_migration do
+      def up
+        create_sequence :a
+        create_sequence :b
+        create_sequence :c
+      end
+    end.up
+
+    assert MysqlDB.custom_sequence?(:a)
+    assert MysqlDB.custom_sequence?(:b)
+    assert MysqlDB.custom_sequence?(:c)
+
+    MysqlDB.drop_sequence?(:a, :b, :c, :d)
+
+    assert !MysqlDB.custom_sequence?(:a)
+    assert !MysqlDB.custom_sequence?(:b)
+    assert !MysqlDB.custom_sequence?(:c)
+  end
+
+  test 'deletes if exists before creating! the sequence' do
+    with_migration do
+      def up
+        create_sequence! :position, { start: 1000, increment: 10 }
+      end
+    end.up
+
+    assert_equal 1000, MysqlDB.currval(:position)
+
+    10.times { MysqlDB.nextval(:position) }
+    assert_equal 1010, MysqlDB.currval(:position)
+
+    MysqlDB.create_sequence!(:position, { start: 1, increment: 1 })
+
+    assert_equal 1, MysqlDB.currval(:position)
+
+    10.times { MysqlDB.nextval(:position) }
+    assert_equal 11, MysqlDB.currval(:position)
+  end
+
+  test 'checks the BIGINT primery key for a sequence table' do
+    with_migration do
+      def up
+        create_sequence :position, { start: 9_223_372_036_854_775_800 }
+      end
+    end.up
+
+    assert_equal 9_223_372_036_854_775_800, MysqlDB.currval(:position)
+    assert_equal 9_223_372_036_854_775_801, MysqlDB.nextval(:position)
+  end
+
+  test 'checks the BIGINT primery key with negative value for a sequence table (does not support)' do
+    with_migration do
+      def up
+        create_sequence :position, { start: -9_223_372_036_854_775_807 }
+      end
+    end.up
+
+    assert_equal(-9_223_372_036_854_775_807, MysqlDB.currval(:position))
+    # https://www.cockroachlabs.com/docs/stable/serial#generated-values-for-modes-rowid-and-virtual_sequence
+    # "...negative values are not returned."
+    assert_equal 1, MysqlDB.nextval(:position)
+  end
 end

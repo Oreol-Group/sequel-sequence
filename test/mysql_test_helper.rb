@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 require 'test_helper'
+# require 'logger'
 
 MysqlDB = Sequel.connect(
+  # loggers: [Logger.new($stdout)],
   adapter: 'mysql2',
   user: ENV['TEST_MYSQL_USERNAME'] || 'root',
   password: ENV['TEST_MYSQL_PASSWORD'] || 'rootroot',

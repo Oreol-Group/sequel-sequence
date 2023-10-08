@@ -238,4 +238,102 @@ class PostgresqlSequenceTest < Minitest::Test
 
     assert_equal pos2 - pos1, 1
   end
+
+  test 'checks exception for delete_to_currval method' do
+    with_migration do
+      def up
+        create_sequence :position_id, if_exists: false, start: 1
+      end
+    end.up
+
+    assert_equal 1, PostgresqlDB.currval(:position_id)
+
+    assert_raises Sequel::MethodNotAllowed do
+      PostgresqlDB.delete_to_currval(:position_id)
+    end
+  end
+
+  test 'deletes sequences by "drop_sequence?"' do
+    with_migration do
+      def up
+        create_sequence :a
+        create_sequence :b
+        create_sequence :c
+      end
+    end.up
+
+    assert PostgresqlDB.custom_sequence?(:a)
+    assert PostgresqlDB.custom_sequence?(:b)
+    assert PostgresqlDB.custom_sequence?(:c)
+
+    PostgresqlDB.drop_sequence?(:a, :b, :c, :d)
+
+    assert !PostgresqlDB.custom_sequence?(:a)
+    assert !PostgresqlDB.custom_sequence?(:b)
+    assert !PostgresqlDB.custom_sequence?(:c)
+  end
+
+  test 'deletes if exists before creating! the sequence' do
+    with_migration do
+      def up
+        create_sequence! :position, { start: 1000, increment: 10 }
+      end
+    end.up
+
+    assert_equal 1000, PostgresqlDB.currval(:position)
+
+    10.times { PostgresqlDB.nextval(:position) }
+    assert_equal 1100, PostgresqlDB.currval(:position)
+
+    PostgresqlDB.create_sequence!(:position, { start: 1, increment: 1 })
+
+    assert_equal 1, PostgresqlDB.currval(:position)
+
+    10.times { PostgresqlDB.nextval(:position) }
+    assert_equal 11, PostgresqlDB.currval(:position)
+  end
+
+  test 'checks the BIGINT primery key for a sequence table' do
+    with_migration do
+      def up
+        create_sequence :position, { start: 9_223_372_036_854_775_800 }
+      end
+    end.up
+
+    assert_equal 9_223_372_036_854_775_800, PostgresqlDB.currval(:position)
+    assert_equal 9_223_372_036_854_775_801, PostgresqlDB.nextval(:position)
+  end
+
+  test 'checks the BIGINT primery key with negative value for a sequence table' do
+    with_migration do
+      def up
+        create_sequence :position, { minvalue: -9_223_372_036_854_775_808 }
+      end
+    end.up
+
+    assert_equal(-9_223_372_036_854_775_808, PostgresqlDB.currval(:position))
+    assert_equal(-9_223_372_036_854_775_807, PostgresqlDB.nextval(:position))
+  end
+
+  # https://www.postgresql.org/docs/current/sql-createsequence.html
+  test 'adds sequence with ext. params' do
+    with_migration do
+      def up
+        create_sequence :position, {
+          data_type: 'smallint',
+          minvalue: -250,
+          maxvalue: 250,
+          start: -1,
+          cache: 3,
+          cycle: 'CYCLE',
+          owned_by: 'NONE',
+          increment: 2,
+          if_exists: false
+        }
+      end
+    end.up
+
+    assert_equal(-1, PostgresqlDB.nextval('position'))
+    assert_equal 1, PostgresqlDB.nextval('position')
+  end
 end

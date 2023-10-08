@@ -20,7 +20,7 @@ class MockSequenceTest < Minitest::Test
     mocked_method.verify
   end
 
-  test 'checks custom_sequence?' do
+  test 'checks "custom_sequence?"' do
     assert_raises Sequel::MethodNotAllowed do
       MockDB.custom_sequence?(:position)
     end
@@ -96,5 +96,23 @@ class MockSequenceTest < Minitest::Test
 
   test 'checks build_exists_condition for a non boolean condition' do
     assert_nil MockDB.build_exists_condition('')
+  end
+
+  test 'checks delete_to_currval' do
+    assert_raises Sequel::MethodNotAllowed do
+      MockDB.delete_to_currval(:position)
+    end
+  end
+
+  test 'checks "drop_sequence?"' do
+    assert_raises Sequel::MethodNotAllowed do
+      MockDB.drop_sequence?(:position)
+    end
+  end
+
+  test 'checks "create_sequence!"' do
+    assert_raises Sequel::MethodNotAllowed do
+      MockDB.create_sequence!(:position)
+    end
   end
 end

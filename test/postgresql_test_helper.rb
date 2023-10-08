@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 require 'test_helper'
+# require 'logger'
 
 PostgresqlDB = Sequel.connect(
+  # loggers: [Logger.new($stdout)],
   adapter: 'postgres',
   user: ENV['TEST_POSTGRES_USERNAME'] || 'postgres',
   password: ENV['TEST_POSTGRES_PASSWORD'] || 'postgres',

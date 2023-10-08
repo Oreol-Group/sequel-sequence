@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 require 'test_helper'
+# require 'logger'
 
 MariaDB = Sequel.connect(
+  # loggers: [Logger.new($stdout)],
   adapter: 'mysql2',
   user: ENV['TEST_MARIA_USERNAME'] || 'root',
   password: ENV['TEST_MARIA_PASSWORD'] || 'root',

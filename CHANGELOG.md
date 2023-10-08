@@ -11,6 +11,16 @@ Prefix your message with one of the following:
 - [Security] in case of vulnerabilities.
 -->
 
+## v0.5.0 - 2023-10-08
+
+- [Fixed] The conditions of migrations were clarified and fixed in README.md.
+- [Added] The `delete_to_currval(name)` method for MySQL and SQLite `SEQUENCE`-table and Exceptions for any other cases.
+- [Added] The `drop_sequence?` can accept multiple arguments with condition 'IF EXISTS'.
+- [Added] The `create_sequence!` drops the `SEQUENCE` if it exists before attempting to create it.
+- [Changed] INT type to BIGINT type for the primery key of a MySQL `SEQUENCE`-table.
+- [Added] The ext. params for the PostgreSql `SEQUENCE` ( https://www.postgresql.org/docs/current/sql-createsequence.html )
+- [Added] The ext. params for the Mariadb `SEQUENCE` ( https://mariadb.com/kb/en/create-sequence )
+
 ## v0.4.2 - 2023-10-03
 
 - [Added] Additions into README.md.

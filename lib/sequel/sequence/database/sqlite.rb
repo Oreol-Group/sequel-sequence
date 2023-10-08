@@ -62,9 +62,13 @@ module Sequel
         end
 
         def set_column_default_nextval(table, column, sequence)
-          run(create_sequenced_column(stringify(table),
-                                      stringify(column),
-                                      stringify(sequence)))
+          run(trigger_create_sequenced_column(stringify(table),
+                                              stringify(column),
+                                              stringify(sequence)))
+        end
+
+        def delete_to_currval(name)
+          run delete_to_current_seq(stringify(name))
         end
 
         private
@@ -113,7 +117,7 @@ module Sequel
           "SELECT MAX(seq) AS id FROM sqlite_sequence WHERE name = '#{name}';"
         end
 
-        def create_sequenced_column(table, column, sequence)
+        def trigger_create_sequenced_column(table, column, sequence)
           %(
             CREATE TRIGGER IF NOT EXISTS #{table}_#{sequence} AFTER INSERT
             ON #{table}
@@ -124,6 +128,10 @@ module Sequel
               WHERE rowid = NEW.rowid;
             END;
           )
+        end
+
+        def delete_to_current_seq(name)
+          "DELETE FROM #{name} WHERE id < (SELECT MAX(id) FROM #{name});"
         end
       end
     end

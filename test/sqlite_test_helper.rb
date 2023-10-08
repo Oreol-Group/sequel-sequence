@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 require 'test_helper'
-require 'logger'
+# require 'logger'
 
 SQLiteDB = Sequel.connect(
-  "sqlite://#{ENV.fetch('TEST_SQLITE_DATABASE', nil) || 'db/test.sqlite3'}",
-  loggers: [Logger.new($stdout)]
+  # loggers: [Logger.new($stdout)],
+  "sqlite://#{ENV.fetch('TEST_SQLITE_DATABASE', nil) || 'db/test.sqlite3'}"
 )
 
 module SqliteTestHelper

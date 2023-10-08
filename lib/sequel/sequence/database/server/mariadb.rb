@@ -26,22 +26,33 @@ module Sequel
           end
 
           def create_sequence(name, options = {})
+            minvalue = options[:minvalue]
+            maxvalue = options[:maxvalue]
+            start = options[:start]
+            cache = options[:cache]
+            cycle = options[:cycle]
+
             increment = options[:increment] || options[:step]
             if_exists = build_exists_condition(options[:if_exists])
             name = quote_name(name.to_s)
 
             sql = ["CREATE SEQUENCE #{if_exists || Sequel::Database::IF_NOT_EXISTS} #{name}"]
             sql << "INCREMENT BY #{increment}" if increment
-            sql << "START WITH #{options[:start]}" if options[:start]
+            sql << "MINVALUE  #{minvalue}" if minvalue
+            sql << "MAXVALUE  #{maxvalue}" if maxvalue
+            sql << "START WITH #{start}" if start
+            sql << "CACHE  #{cache}" if cache
+            sql << cycle.to_s if cycle
+            sql << "COMMENT '#{Sequel::Database::SEQUENCE_COMMENT}'"
             sql << ';'
 
             run(sql.join("\n"))
           end
 
-          def drop_sequence(name)
+          def drop_sequence(name, options = {})
+            if_exists = build_exists_condition(options[:if_exists])
             name = quote_name(name.to_s)
-            sql = "DROP SEQUENCE IF EXISTS #{name}"
-            run(sql)
+            run drop_sequence_table(name, if_exists)
           end
 
           def nextval(name)
@@ -96,6 +107,10 @@ module Sequel
 
           def name_of_current_database
             fetch('SELECT DATABASE() AS db;').first[:db]
+          end
+
+          def drop_sequence_table(name, if_exists = nil)
+            "DROP SEQUENCE #{if_exists || Sequel::Database::IF_EXISTS} #{name};"
           end
         end
       end

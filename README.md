@@ -24,8 +24,6 @@ gem 'sequel-sequence'
 To create and delete a `SEQUENCE`, simply use the `create_sequence` and `drop_sequence` methods.
 
 ```ruby
-require 'sequel-sequence'
-
 Sequel.migration do
   up do
     create_sequence :position, if_exists: false
@@ -39,8 +37,6 @@ end
 
 It would also be correct to write:
 ```ruby
-require 'sequel-sequence'
-
 Sequel.migration do
   up do
     create_sequence :position
@@ -86,6 +82,17 @@ Sequel.migration do
 end
 ```
 
+Before running the migration for your application, don't forget to invoke `require`s, for example like this:
+```ruby
+require 'sequel'
+require 'sequel-sequence'
+
+migrate = -> (env, version) do
+  ...
+  Sequel::Migrator.apply(DB, 'db/migrations', version)
+end
+```
+
 This gem also adds a few helpers to interact with `SEQUENCE`s.
 
 ```ruby
@@ -120,7 +127,10 @@ and
 DB.nextval_with_label(:position, 1)
 ```
 
-By default, `fiction` has a zero value.
+By default, `fiction` has a zero value. Moreover, it is assumed that you can use the history of sequence changes, for example, to collect statistics on the fiction field. However, in most cases, such statistics will not be necessary and you can program periodic cleaning of the SEQUENCE table using the method:
+```ruby
+DB.delete_to_currval(:position)
+```
 
 Otherwise, the operation of this gem for SQLite and MySQL is similar to the ways of using Sequence in more advanced RDBMS. There is only one difference here, you won't be able to change the increment value from 1 to another using the `increment` or `step` parameter.
 
@@ -129,11 +139,27 @@ Otherwise, the operation of this gem for SQLite and MySQL is similar to the ways
 - This solution does not allow you to simultaneously work with MySQL and MariaDB databases from one application. If such a need arises, move the data processing functionality to different microservices.
 - When you start with a new database in SQLite, you'll receive an error message - "`SQLite3::SQLException: no such table: sqlite_sequence`".  `sqlite_sequence` table is not created, until you define at least one autoincrement and primary key column in your schema.
 
-## Additional handy functions
+All methods defined in this gem can use either a String or a Symbol parameter to denote a `SEQUENCE`. 
+```ruby
+DB.nextval('position')
+```
+is equivalent to
+```ruby
+DB.nextval(:position)
+```
+- This solution allows you to specify advanced options for a `SEQUENCE` when creating it in PostgreSQL and MariaDB. For more information, check out the description at https://www.postgresql.org/docs/current/sql-createsequence.html and https://mariadb.com/kb/en/create-sequence.
+
+## Additional handy methods:
 
 To discover a database information about `SEQUENCE`s you could take advantage of `check_sequences` and `custom_sequence?` methods.
 - `custom_sequence?(:sequence_name)` allows you to instantly find out the availability of the called `SEQUENCE`. 
 - `check_sequences` provides complete information about known `SEQUENCE`s in the datebase. The output data depends on RDBMS.
+
+To remove several sequences at once, you can use the method:
+- `drop_sequence?` can accept multiple arguments of `SEQUENCE`s and checks the `IF EXISTS` condition for each one.
+
+To drop previous `SEQUENCE` and recreate the new one utilize the method:
+- `create_sequence!`.
 
 ## Maintainer
 
