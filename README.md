@@ -134,9 +134,9 @@ DB.delete_to_currval(:position)
 
 Otherwise, the operation of this gem for SQLite and MySQL is similar to the ways of using Sequence in more advanced RDBMS. There is only one difference here, you won't be able to change the increment value from 1 to another using the `increment` or `step` parameter.
 
-## Known issues you may encounter
+## Known issues you may be faced
 
-- This solution does not allow you to simultaneously work with MySQL and MariaDB databases from one application. If such a need arises, move the data processing functionality to different microservices.
+- This solution does not allow you to simultaneously work with MySQL and MariaDB databases from one application. If such a need arises, move the data processing functionality to different services.
 - When you start with a new database in SQLite, you'll receive an error message - "`SQLite3::SQLException: no such table: sqlite_sequence`".  `sqlite_sequence` table is not created, until you define at least one autoincrement and primary key column in your schema.
 
 All methods defined in this gem can use either a String or a Symbol parameter to denote a `SEQUENCE`. 
