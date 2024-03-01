@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'minitest-utils', '~> 0.4.6'
   spec.add_development_dependency 'pry-byebug', '~> 3.10.1'
   spec.add_development_dependency 'rake', '~> 13.1.0'
-  spec.add_development_dependency 'rubocop', '~> 1.60.0'
+  spec.add_development_dependency 'rubocop', '~> 1.61.0'
   spec.add_development_dependency 'simplecov', '~> 0.22.0'
   # if RUBY_ENGINE == 'jruby'
   #   # JRuby Adapter Dependencies
